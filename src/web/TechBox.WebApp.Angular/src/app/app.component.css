@@ -24,6 +24,21 @@
   padding: 0 16px;
 }
 
+.download-icon {
+  padding-right: 15px;
+  color: #4abc96;
+}
+
+.edit-icon {
+  padding-right: 15px;
+  color: #1499db;
+}
+
+.delete-icon {
+  padding-right: 15px;
+  color: #f50018;
+}
+
 svg#clouds {
   position: fixed;
   bottom: -160px;

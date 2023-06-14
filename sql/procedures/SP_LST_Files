@@ -1,0 +1,40 @@
+USE TechBox;
+GO
+
+CREATE OR ALTER PROCEDURE SP_LST_Files
+	@PageNumber BIGINT = NULL,
+	@PageSize BIGINT = NULL
+AS
+BEGIN
+	IF @PageNumber IS NOT NULL AND @PageSize IS NOT NULL
+		BEGIN
+			SELECT 
+				Id, 
+				IsDeleted, 
+				CreatedAt, 
+				Name, 
+				Extension, 
+				SizeInBytes, 
+				Url, 
+				ProcessStatusId 
+			FROM 
+				Files
+			ORDER BY Id
+			OFFSET (@PageNumber - 1) * @PageSize ROWS
+			FETCH NEXT @PageSize ROWS ONLY;
+		END
+	ELSE
+		BEGIN
+			SELECT 
+				Id, 
+				IsDeleted, 
+				CreatedAt, 
+				Name, 
+				Extension, 
+				SizeInBytes, 
+				Url, 
+				ProcessStatusId 
+			FROM 
+				Files;
+		END;
+END;

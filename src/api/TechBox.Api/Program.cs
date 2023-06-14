@@ -10,8 +10,10 @@ builder.Configuration
 
 builder.Services.AddControllers(options => options.Filters.AddFilterConfiguration());
 
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerConfiguration();
+builder.Services
+    .AddEndpointsApiExplorer()
+    .AddSwaggerConfiguration()
+    .AddDataConfiguration(builder.Configuration);
 
 var app = builder.Build();
 

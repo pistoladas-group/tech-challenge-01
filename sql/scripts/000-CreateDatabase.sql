@@ -23,3 +23,9 @@ BEGIN
     CREATE USER [techbox] FOR LOGIN [techbox]
 END;
 GO
+
+IF EXISTS (SELECT name FROM sys.database_principals WHERE name = 'techbox')
+BEGIN
+	GRANT EXECUTE TO [techbox];
+END;
+GO

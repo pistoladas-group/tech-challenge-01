@@ -2,6 +2,7 @@ using System.Net;
 
 using Microsoft.AspNetCore.Mvc;
 
+using TechBox.Api.Data;
 using TechBox.Api.Models;
 
 namespace TechBox.Api.Controllers;
@@ -11,10 +12,12 @@ namespace TechBox.Api.Controllers;
 public class FilesController : ControllerBase
 {
     private readonly ILogger<FilesController> _logger;
+    private readonly IFileRepository _fileRepository;
 
-    public FilesController(ILogger<FilesController> logger)
+    public FilesController(ILogger<FilesController> logger, IFileRepository fileRepository)
     {
         _logger = logger;
+        _fileRepository = fileRepository;
     }
 
     /// <summary>
@@ -29,6 +32,9 @@ public class FilesController : ControllerBase
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
     public async Task<IActionResult> GetAllFiles()
     {
+        //TODO: Remover
+        var teste = _fileRepository.ListFiles(null, 10);
+
         return Ok(new ApiResponse());
     }
 }

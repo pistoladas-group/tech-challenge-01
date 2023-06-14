@@ -6,7 +6,7 @@ namespace TechBox.Api.Configurations;
 
 public static class Swagger
 {
-    public static void AddSwaggerConfiguration(this IServiceCollection services)
+    public static IServiceCollection AddSwaggerConfiguration(this IServiceCollection services)
     {
         services.AddSwaggerGen(options =>
         {
@@ -26,6 +26,8 @@ public static class Swagger
             var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
             options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
         });
+
+        return services;
     }
 
     public static void UseSwaggerConfiguration(this IApplicationBuilder app)

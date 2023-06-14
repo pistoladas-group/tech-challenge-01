@@ -3,6 +3,12 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{40E5764A-3561-45B8-AAC3-5ED124EE6823}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "api", "api", "{6E402377-732A-4158-BBC0-FB3EA1B111AC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TechBox.Api", "src\api\TechBox.Api\TechBox.Api.csproj", "{CD8CF58B-6621-4B9F-A109-354BD5E47E5D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -10,5 +16,15 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{CD8CF58B-6621-4B9F-A109-354BD5E47E5D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CD8CF58B-6621-4B9F-A109-354BD5E47E5D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CD8CF58B-6621-4B9F-A109-354BD5E47E5D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CD8CF58B-6621-4B9F-A109-354BD5E47E5D}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{6E402377-732A-4158-BBC0-FB3EA1B111AC} = {40E5764A-3561-45B8-AAC3-5ED124EE6823}
+		{CD8CF58B-6621-4B9F-A109-354BD5E47E5D} = {6E402377-732A-4158-BBC0-FB3EA1B111AC}
 	EndGlobalSection
 EndGlobal

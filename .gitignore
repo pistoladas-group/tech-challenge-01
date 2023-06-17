@@ -481,3 +481,4 @@ $RECYCLE.BIN/
 /.angular
 .angular/
 .idea
+dist/

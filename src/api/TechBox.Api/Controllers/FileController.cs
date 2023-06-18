@@ -1,7 +1,5 @@
 using System.Net;
-
 using Microsoft.AspNetCore.Mvc;
-
 using TechBox.Api.Data;
 using TechBox.Api.Models;
 
@@ -33,8 +31,8 @@ public class FilesController : ControllerBase
     public async Task<IActionResult> GetAllFiles()
     {
         //TODO: Remover
-        var teste = _fileRepository.ListFiles(null, 10);
+        var teste = _fileRepository.ListFiles(1, 10);
 
-        return Ok(new ApiResponse());
+        return Ok(new ApiResponse(data: teste));
     }
 }

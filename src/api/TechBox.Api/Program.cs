@@ -12,7 +12,8 @@ builder.Services.AddControllers(options => options.Filters.AddFilterConfiguratio
 builder.Services
     .AddEndpointsApiExplorer()
     .AddSwaggerConfiguration()
-    .AddDataConfiguration(builder.Configuration);
+    .AddEnvironmentVariables()
+    .AddDataConfiguration();
 
 var app = builder.Build();
 

@@ -7,6 +7,8 @@ namespace TechBox.Api.Configurations;
 public static class EnvironmentVariables
 {
     public static string DatabaseConnectionString => "TECHBOX_API_DATABASE_CONNECTION_STRING";
+    public static string StorageAccountUrl => "TECHBOX_API_AZURE_STORAGE_ACCOUNT_URL";
+    public static string StorageAccountImagesContainerName => "TECHBOX_API_AZURE_STORAGE_ACCOUNT_IMAGES_CONTAINER_NAME";
 
     public static IServiceCollection AddEnvironmentVariables(this IServiceCollection services)
     {

@@ -16,9 +16,17 @@ public class FileRepository : IFileRepository
         return await _storedProcedureHandler.ExecuteListAsync<FileDto>("SP_LST_Files", new ListProcedureParameters(pageNumber, pageSize));
     }
 
-    public async Task<FileDto> GetFileByIdAsync(Guid fileId)
+    public async Task<FileDto?> GetFileByIdAsync(Guid fileId)
     {
-        return await _storedProcedureHandler.ExecuteGetAsync<FileDto>("SP_GET_FileById", new GetProcedureParameters(fileId));
+        try
+        {
+            return await _storedProcedureHandler.ExecuteGetAsync<FileDto>("SP_GET_FileById", new GetProcedureParameters(fileId));
+        }
+        catch (InvalidOperationException e) when (e.Message == "Sequence contains no elements")
+        {
+            Console.WriteLine(e);
+            return null;
+        }
     }
 
     public async Task<Guid> AddFileAsync(AddFileDto fileDto)

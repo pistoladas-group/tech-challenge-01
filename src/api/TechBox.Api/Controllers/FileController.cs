@@ -2,6 +2,7 @@ using System.Net;
 using Azure.Identity;
 using Azure.Storage.Blobs;
 using Microsoft.AspNetCore.Mvc;
+using TechBox.Api.Configurations;
 using TechBox.Api.Data;
 using TechBox.Api.Data.Dto;
 using TechBox.Api.Models;
@@ -54,7 +55,17 @@ public class FilesController : ControllerBase
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
     public async Task<IActionResult> GetFileById([FromRoute] Guid fileId)
     {
+        if (fileId == Guid.Empty)
+        {
+            return BadRequest(new ApiResponse());
+        }
+        
         var storedFile = await _fileRepository.GetFileByIdAsync(fileId);
+
+        if (storedFile is null)
+        {
+            return NotFound(new ApiResponse());
+        }
 
         return Ok(new ApiResponse(data: storedFile));
     }
@@ -83,18 +94,23 @@ public class FilesController : ControllerBase
             ProcessStatusId = ProcessStatusEnum.Pending
         });
 
-        //TODO: mudar status para processing
+        //TODO: mudar status para processing e criar serviço de processamento (serviço deve validar variáveis de ambiente)
+        //TODO: gravar o tipo de processamento como Inclusão
         var blobServiceClient = new BlobServiceClient(
-            new Uri("https://techboxstorage.blob.core.windows.net"),
+            new Uri(Environment.GetEnvironmentVariable(EnvironmentVariables.StorageAccountUrl)),
             new DefaultAzureCredential());
 
-        var containerClient = blobServiceClient.GetBlobContainerClient("images");
+        var containerClient = blobServiceClient.GetBlobContainerClient(Environment.GetEnvironmentVariable(EnvironmentVariables.StorageAccountImagesContainerName));
         var blobClient = containerClient.GetBlobClient(formFile.FileName);
 
+        //TODO: aqui pode dar erro.
+        //TODO: tentar passar o content type
         await using (var stream = formFile.OpenReadStream())
-        await blobClient.UploadAsync(stream);
+        {
+            await blobClient.UploadAsync(stream);
+        }
 
-        //TODO: mudar status para uploaded ou erro
+        //TODO: mudar status para sucesso ou erro, atualizar url
         return CreatedAtAction(nameof(GetFileById), new { fileId }, new ApiResponse());
     }
 
@@ -114,6 +130,8 @@ public class FilesController : ControllerBase
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
     public async Task<IActionResult> DeleteFile([FromRoute] Guid fileId)
     {
+        //TODO: gravar o tipo de processamento como exclusão
+
         return Ok(new ApiResponse());
     }
 }

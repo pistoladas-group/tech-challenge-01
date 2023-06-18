@@ -1,6 +1,9 @@
 using System.Net;
+
 using Microsoft.AspNetCore.Mvc;
+
 using TechBox.Api.Data;
+using TechBox.Api.Data.Dto;
 using TechBox.Api.Models;
 
 namespace TechBox.Api.Controllers;
@@ -34,7 +37,7 @@ public class FilesController : ControllerBase
 
         return Ok(new ApiResponse(data: storedFiles));
     }
-    
+
     /// <summary>
     /// Get file by id
     /// </summary>
@@ -55,7 +58,7 @@ public class FilesController : ControllerBase
 
         return Ok(new ApiResponse(data: storedFile));
     }
-    
+
     /// <summary>
     /// Upload a file
     /// </summary>
@@ -63,16 +66,26 @@ public class FilesController : ControllerBase
     /// <response code="400">There is a problem with the request</response>
     /// <response code="500">An internal error occurred</response>
     [HttpPost("")]
-    [Consumes("application/json")]
+    [Consumes("multipart/form-data")]
     [Produces("application/json")]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.Created)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-    public async Task<IActionResult> UploadFile()
+    public async Task<IActionResult> UploadFile(IFormFile formFile)
     {
-        return Ok(new ApiResponse());
+        var fileName = formFile.FileName.Split(".");
+
+        var fileId = await _fileRepository.AddFileAsync(new AddFileDto()
+        {
+            Name = fileName[0],
+            Extension = fileName[1].ToLower(), // TODO: Somente arquivos com extensão de imagens
+            SizeInBytes = (int)formFile.Length, // TODO: Limitar tamanho do arquivo
+            ProcessStatusId = ProcessStatusEnum.Pending
+        });
+
+        return CreatedAtAction(nameof(GetFileById), new { fileId }, new ApiResponse());
     }
-    
+
     /// <summary>
     /// Delete a file
     /// </summary>

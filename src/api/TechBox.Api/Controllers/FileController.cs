@@ -1,7 +1,7 @@
 using System.Net;
-
+using Azure.Identity;
+using Azure.Storage.Blobs;
 using Microsoft.AspNetCore.Mvc;
-
 using TechBox.Api.Data;
 using TechBox.Api.Data.Dto;
 using TechBox.Api.Models;
@@ -73,16 +73,28 @@ public class FilesController : ControllerBase
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
     public async Task<IActionResult> UploadFile(IFormFile formFile)
     {
-        var fileName = formFile.FileName.Split(".");
-
+        var fileNameSplit = formFile.FileName.Split(".");
+        
         var fileId = await _fileRepository.AddFileAsync(new AddFileDto()
         {
-            Name = fileName[0],
-            Extension = fileName[1].ToLower(), // TODO: Somente arquivos com extens�o de imagens
+            Name = fileNameSplit[0],
+            Extension = fileNameSplit[1].ToLower(), // TODO: Somente arquivos com extens�o de imagens
             SizeInBytes = (int)formFile.Length, // TODO: Limitar tamanho do arquivo
             ProcessStatusId = ProcessStatusEnum.Pending
         });
 
+        //TODO: mudar status para processing
+        var blobServiceClient = new BlobServiceClient(
+            new Uri("https://techboxstorage.blob.core.windows.net"),
+            new DefaultAzureCredential());
+
+        var containerClient = blobServiceClient.GetBlobContainerClient("images");
+        var blobClient = containerClient.GetBlobClient(formFile.FileName);
+
+        await using (var stream = formFile.OpenReadStream())
+        await blobClient.UploadAsync(stream);
+
+        //TODO: mudar status para uploaded ou erro
         return CreatedAtAction(nameof(GetFileById), new { fileId }, new ApiResponse());
     }
 

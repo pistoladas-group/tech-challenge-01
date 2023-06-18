@@ -2,30 +2,14 @@
 {
     public class ListProcedureDto
     {
-        private int? _pageNumber;
-        public int? PageNumber
-        {
-            get
-            {
-                return _pageNumber;
-            }
-            set
-            {
-                _pageNumber = value <= 0 ? 1 : value;
-            }
-        }
+        public int PageNumber { get; }
 
-        private int? _pageSize;
-        public int? PageSize
+        public int PageSize { get; }
+
+        public ListProcedureDto(int pageNumber, int pageSize)
         {
-            get
-            {
-                return _pageSize;
-            }
-            set
-            {
-                _pageSize = value <= 0 ? 1 : value;
-            }
+            PageNumber = pageNumber <= 0 ? 1 : pageNumber;
+            PageSize = pageNumber <= 0 ? 1 : pageSize;
         }
     }
 }

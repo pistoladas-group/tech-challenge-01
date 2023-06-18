@@ -4,16 +4,16 @@ namespace TechBox.Api.Data
 {
     public class FileRepository : IFileRepository
     {
-        private readonly IStoredProcedureHandler _storedProcedure;
+        private readonly IStoredProcedureHandler _storedProcedureHandler;
 
-        public FileRepository(IStoredProcedureHandler storedProcedure)
+        public FileRepository(IStoredProcedureHandler storedProcedureHandler)
         {
-            _storedProcedure = storedProcedure;
+            _storedProcedureHandler = storedProcedureHandler;
         }
 
-        public IEnumerable<ListFilesDto> ListFiles(int? pageNumber = null, int? pageSize = null)
+        public IEnumerable<ListFilesDto> ListFiles(int pageNumber, int pageSize)
         {
-            return _storedProcedure.ExecuteList<ListFilesDto>("SP_LST_Files", new ListProcedureDto() { PageNumber = pageNumber, PageSize = pageSize });
+            return _storedProcedureHandler.ExecuteList<ListFilesDto>("SP_LST_Files", new ListProcedureDto(pageNumber, pageSize));
         }
     }
 }

@@ -4,6 +4,6 @@ namespace TechBox.Api.Data
 {
     public interface IFileRepository
     {
-        IEnumerable<ListFilesDto> ListFiles(int? pageNumber = null, int? pageSize = null);
+        IEnumerable<ListFilesDto> ListFiles(int pageNumber, int pageSize);
     }
 }

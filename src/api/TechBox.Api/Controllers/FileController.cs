@@ -100,7 +100,7 @@ public class FilesController : ControllerBase
             new Uri(Environment.GetEnvironmentVariable(EnvironmentVariables.StorageAccountUrl)),
             new DefaultAzureCredential());
 
-        var containerClient = blobServiceClient.GetBlobContainerClient(Environment.GetEnvironmentVariable(EnvironmentVariables.StorageAccountImagesContainerName));
+        var containerClient = blobServiceClient.GetBlobContainerClient(Environment.GetEnvironmentVariable(EnvironmentVariables.StorageAccountContainerName));
         var blobClient = containerClient.GetBlobClient(formFile.FileName);
 
         //TODO: aqui pode dar erro.

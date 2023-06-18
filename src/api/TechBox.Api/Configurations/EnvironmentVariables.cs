@@ -11,7 +11,6 @@ public static class EnvironmentVariables
     public static IServiceCollection AddEnvironmentVariables(this IServiceCollection services)
     {
         DotEnv.Fluent()
-            .WithExceptions()
             .WithEnvFiles()
             .WithTrimValues()
             .WithEncoding(Encoding.UTF8)

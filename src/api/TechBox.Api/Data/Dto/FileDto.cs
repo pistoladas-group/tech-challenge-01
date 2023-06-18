@@ -1,6 +1,6 @@
 ﻿namespace TechBox.Api.Data.Dto
 {
-    public class ListFilesDto
+    public class FileDto
     {
         public Guid Id { get; set; }
         public bool IsDeleted { get; set; }

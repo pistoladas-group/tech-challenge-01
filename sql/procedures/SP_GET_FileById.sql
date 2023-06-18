@@ -1,7 +1,6 @@
-CREATE OR ALTER PROCEDURE SP_LST_Files
+CREATE OR ALTER PROCEDURE SP_GET_FileById
 (
-	@PageNumber BIGINT,
-	@PageSize BIGINT
+	@Id UNIQUEIDENTIFIER
 )
 AS
 BEGIN
@@ -17,11 +16,6 @@ BEGIN
     FROM
         Files
     WHERE
-        Files.IsDeleted = 0
-    ORDER BY
-        Files.Id
-    OFFSET
-        (@PageNumber - 1) * @PageSize ROWS
-    FETCH NEXT
-        @PageSize ROWS ONLY;
+        Files.IsDeleted = 0 AND
+        Files.Id = @Id
 END;

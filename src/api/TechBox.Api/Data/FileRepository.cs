@@ -11,9 +11,14 @@ namespace TechBox.Api.Data
             _storedProcedureHandler = storedProcedureHandler;
         }
 
-        public IEnumerable<ListFilesDto> ListFiles(int pageNumber, int pageSize)
+        public async Task<IEnumerable<FileDto>> ListFilesAsync(int pageNumber, int pageSize)
         {
-            return _storedProcedureHandler.ExecuteList<ListFilesDto>("SP_LST_Files", new ListProcedureDto(pageNumber, pageSize));
+            return await _storedProcedureHandler.ExecuteListAsync<FileDto>("SP_LST_Files", new ListProcedureParameters(pageNumber, pageSize));
+        }
+
+        public async Task<FileDto> GetFileByIdAsync(Guid fileId)
+        {
+            return await _storedProcedureHandler.ExecuteGetAsync<FileDto>("SP_GET_FileById", new GetProcedureParameters(fileId));
         }
     }
 }

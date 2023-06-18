@@ -4,6 +4,7 @@ namespace TechBox.Api.Data
 {
     public interface IFileRepository
     {
-        IEnumerable<ListFilesDto> ListFiles(int pageNumber, int pageSize);
+        Task<IEnumerable<FileDto>> ListFilesAsync(int pageNumber, int pageSize);
+        Task<FileDto> GetFileByIdAsync(Guid fileId);
     }
 }

@@ -1,15 +1,12 @@
-﻿using Dapper;
-
-using System.Data;
-
+﻿using System.Data;
+using Dapper;
 using TechBox.Api.Data.Dto;
 
 namespace TechBox.Api.Data.SqlServer
 {
     public sealed class SqlServerStoredProcedureHandler : IStoredProcedureHandler
     {
-        public readonly int CommandTimeout = 300;
-
+        public const int CommandTimeout = 10;
         private readonly SqlServerSession _session;
 
         public SqlServerStoredProcedureHandler(SqlServerSession session)
@@ -17,15 +14,29 @@ namespace TechBox.Api.Data.SqlServer
             _session = session;
         }
 
-        public IEnumerable<T1> ExecuteList<T1>(string procedureName, ListProcedureDto procedureParameter, int? commandTimeout = null)
+        public async Task<IEnumerable<T1>> ExecuteListAsync<T1>(string procedureName, ListProcedureParameters procedureParameter, int? commandTimeout = null)
         {
             using (_session)
             {
-                var procedureResult = _session.Connection.Query<T1>(
+                var procedureResult = await _session.Connection.QueryAsync<T1>(
                     procedureName,
                     param: procedureParameter,
                     commandType: CommandType.StoredProcedure,
-                    commandTimeout: commandTimeout);
+                    commandTimeout: commandTimeout ?? CommandTimeout);
+
+                return procedureResult;
+            }
+        }
+
+        public async Task<T1> ExecuteGetAsync<T1>(string procedureName, GetProcedureParameters procedureParameter, int? commandTimeout = null)
+        {
+            using (_session)
+            {
+                var procedureResult = await _session.Connection.QuerySingleAsync<T1>(
+                    procedureName,
+                    param: procedureParameter,
+                    commandType: CommandType.StoredProcedure,
+                    commandTimeout: commandTimeout ?? CommandTimeout);
 
                 return procedureResult;
             }

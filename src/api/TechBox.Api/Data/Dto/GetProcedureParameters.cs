@@ -1,15 +1,14 @@
-﻿namespace TechBox.Api.Data.Dto
+﻿namespace TechBox.Api.Data.Dto;
+
+public class GetProcedureParameters
 {
-    public class GetProcedureParameters
+    public Guid Id { get; init; }
+
+    public GetProcedureParameters(Guid id)
     {
-        public Guid Id { get; init; }
-        
-        public GetProcedureParameters(Guid id)
+        if (id != Guid.Empty)
         {
-            if (id != Guid.Empty)
-            {
-                Id = id;
-            }
+            Id = id;
         }
     }
 }

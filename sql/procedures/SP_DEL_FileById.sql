@@ -11,5 +11,5 @@ BEGIN
         Files.IsDeleted = 0 AND
         Files.Id = @Id
     
-    SELECT @@ROWCOUNT 'AffectedRows'
+    SELECT @@ROWCOUNT 'AffectedRows';
 END;

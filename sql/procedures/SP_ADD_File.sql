@@ -33,4 +33,6 @@ BEGIN
         @Url,
         @ProcessStatusId
     );
+
+    SELECT @@ROWCOUNT 'AffectedRows';
 END;

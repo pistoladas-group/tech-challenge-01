@@ -78,7 +78,7 @@ public class FilesController : ControllerBase
         var fileId = await _fileRepository.AddFileAsync(new AddFileDto()
         {
             Name = fileName[0],
-            Extension = fileName[1].ToLower(), // TODO: Somente arquivos com extensão de imagens
+            Extension = fileName[1].ToLower(), // TODO: Somente arquivos com extensï¿½o de imagens
             SizeInBytes = (int)formFile.Length, // TODO: Limitar tamanho do arquivo
             ProcessStatusId = ProcessStatusEnum.Pending
         });

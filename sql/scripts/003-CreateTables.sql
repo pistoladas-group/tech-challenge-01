@@ -9,7 +9,6 @@ BEGIN
         [CreatedAt] DATETIME NOT NULL,
 
         [Name] VARCHAR(100) NOT NULL,
-        [Extension] VARCHAR(15) NOT NULL,
         [SizeInBytes] INT NOT NULL,
         [Url] VARCHAR(2500) NULL,
         [ProcessStatusId] TINYINT NOT NULL,

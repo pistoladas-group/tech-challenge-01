@@ -13,7 +13,8 @@ builder.Services
     .AddEndpointsApiExplorer()
     .AddSwaggerConfiguration()
     .AddEnvironmentVariables()
-    .AddDataConfiguration();
+    .AddDataConfiguration()
+    .AddFileStorageConfiguration();
 
 var app = builder.Build();
 

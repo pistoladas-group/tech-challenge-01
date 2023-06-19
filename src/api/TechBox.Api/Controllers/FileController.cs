@@ -1,11 +1,9 @@
 using System.Net;
-using Azure.Identity;
-using Azure.Storage.Blobs;
 using Microsoft.AspNetCore.Mvc;
-using TechBox.Api.Configurations;
 using TechBox.Api.Data;
 using TechBox.Api.Data.Dto;
 using TechBox.Api.Models;
+using TechBox.Api.Services;
 
 namespace TechBox.Api.Controllers;
 
@@ -15,11 +13,13 @@ public class FilesController : ControllerBase
 {
     private readonly ILogger<FilesController> _logger;
     private readonly IFileRepository _fileRepository;
+    private readonly IFileStorageService _fileStorageService;
 
-    public FilesController(ILogger<FilesController> logger, IFileRepository fileRepository)
+    public FilesController(ILogger<FilesController> logger, IFileRepository fileRepository, IFileStorageService fileStorageService)
     {
         _logger = logger;
         _fileRepository = fileRepository;
+        _fileStorageService = fileStorageService;
     }
 
     /// <summary>
@@ -85,30 +85,28 @@ public class FilesController : ControllerBase
     public async Task<IActionResult> UploadFile(IFormFile formFile)
     {
         var fileNameSplit = formFile.FileName.Split(".");
+
+        if (fileNameSplit.Length <= 1)
+        {
+            return BadRequest(new ApiResponse(error: "invalid file extension"));
+        }
+
+        var extension = fileNameSplit[1];
+        var isSupportedExtension = _fileStorageService.SupportedFileExtensions().Contains(extension);
+
+        if (!isSupportedExtension)
+        {
+            return BadRequest(new ApiResponse(error: "invalid file extension"));
+        }
         
         var fileId = await _fileRepository.AddFileAsync(new AddFileDto()
         {
-            Name = fileNameSplit[0],
-            Extension = fileNameSplit[1].ToLower(), // TODO: Somente arquivos com extens�o de imagens
+            Name = formFile.FileName,
             SizeInBytes = (int)formFile.Length, // TODO: Limitar tamanho do arquivo
             ProcessStatusId = ProcessStatusEnum.Pending
         });
 
-        //TODO: mudar status para processing e criar serviço de processamento (serviço deve validar variáveis de ambiente)
-        //TODO: gravar o tipo de processamento como Inclusão
-        var blobServiceClient = new BlobServiceClient(
-            new Uri(Environment.GetEnvironmentVariable(EnvironmentVariables.StorageAccountUrl)),
-            new DefaultAzureCredential());
-
-        var containerClient = blobServiceClient.GetBlobContainerClient(Environment.GetEnvironmentVariable(EnvironmentVariables.StorageAccountContainerName));
-        var blobClient = containerClient.GetBlobClient(formFile.FileName);
-
-        //TODO: aqui pode dar erro.
-        //TODO: tentar passar o content type
-        await using (var stream = formFile.OpenReadStream())
-        {
-            await blobClient.UploadAsync(stream);
-        }
+        await _fileStorageService.UploadFile(formFile);
 
         //TODO: mudar status para sucesso ou erro, atualizar url
         return CreatedAtAction(nameof(GetFileById), new { fileId }, new ApiResponse());

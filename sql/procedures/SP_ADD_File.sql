@@ -4,7 +4,6 @@ CREATE OR ALTER PROCEDURE SP_ADD_File
     @IsDeleted BIT,
     @CreatedAt DATETIME,
     @Name VARCHAR(100),
-    @Extension VARCHAR(100),
     @SizeInBytes INT,
     @Url VARCHAR(2500),
     @ProcessStatusId TINYINT
@@ -17,7 +16,6 @@ BEGIN
         IsDeleted, 
         CreatedAt, 
         Name, 
-        Extension, 
         SizeInBytes, 
         Url, 
         ProcessStatusId
@@ -28,7 +26,6 @@ BEGIN
         @IsDeleted, 
         @CreatedAt,
         @Name,
-        @Extension,
         @SizeInBytes,
         @Url,
         @ProcessStatusId

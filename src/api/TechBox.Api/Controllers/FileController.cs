@@ -1,5 +1,7 @@
 using System.Net;
+
 using Microsoft.AspNetCore.Mvc;
+
 using TechBox.Api.Data;
 using TechBox.Api.Data.Dto;
 using TechBox.Api.Models;
@@ -91,7 +93,7 @@ public class FilesController : ControllerBase
             return BadRequest(new ApiResponse(error: "invalid file extension"));
         }
 
-        var extension = fileNameSplit[1];
+        var extension = fileNameSplit[1].ToLower();
         var isSupportedExtension = _fileStorageService.SupportedFileExtensions().Contains(extension);
 
         if (!isSupportedExtension)
@@ -132,7 +134,7 @@ public class FilesController : ControllerBase
             return NotFound(new ApiResponse("no file found"));
         }
 
-        // TODO: "Marcado" para remover, agora outro processo se encarregarï¿½ de processar
+        // TODO: "Marcado" para remover, agora outro processo se encarregará de processar
 
         var fileLogId = await _fileRepository.AddFileLogAsync(new AddFileLogDto()
         {

@@ -7,4 +7,6 @@ public interface IStoredProcedureHandler
     Task<IEnumerable<T1>> ExecuteListAsync<T1>(string procedureName, ListProcedureParameters procedureParameter, int? commandTimeout = null);
     Task<T1> ExecuteGetAsync<T1>(string procedureName, GetProcedureParameters procedureParameter, int? commandTimeout = null);
     Task<int> ExecuteAddAsync(string procedureName, AddProcedureParameters procedureParameter, int? commandTimeout = null);
+    Task<int> ExecuteUpdateAsync(string procedureName, UpdateProcedureParameters procedureParameter, int? commandTimeout = null);
+    Task<int> ExecuteDeleteAsync(string procedureName, DeleteProcedureParameters procedureParameter, int? commandTimeout = null);
 }

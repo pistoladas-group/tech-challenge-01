@@ -57,4 +57,26 @@ public sealed class SqlServerStoredProcedureHandler : IStoredProcedureHandler
             return procedureResult;
         }
     }
+
+    public async Task<int> ExecuteUpdateAsync(string procedureName, UpdateProcedureParameters procedureParameter, int? commandTimeout = null)
+    {
+        var procedureResult = await _session.Connection.ExecuteAsync(
+            procedureName,
+            param: procedureParameter,
+            commandType: CommandType.StoredProcedure,
+            commandTimeout: commandTimeout ?? CommandTimeout);
+
+        return procedureResult;
+    }
+
+    public async Task<int> ExecuteDeleteAsync(string procedureName, DeleteProcedureParameters procedureParameter, int? commandTimeout = null)
+    {
+        var procedureResult = await _session.Connection.ExecuteAsync(
+            procedureName,
+            param: procedureParameter,
+            commandType: CommandType.StoredProcedure,
+            commandTimeout: commandTimeout ?? CommandTimeout);
+
+        return procedureResult;
+    }
 }

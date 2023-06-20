@@ -29,7 +29,7 @@ BEGIN
         [ProcessStatusId] TINYINT NOT NULL,
         [ProcessTypeId] TINYINT NOT NULL,
         [ErrorMessage] VARCHAR(1000) NULL,
-        [StartedAt] DATETIME NOT NULL,
+        [StartedAt] DATETIME NULL,
         [FinishedAt] DATETIME NULL,
         CONSTRAINT [PK_FileLogs] PRIMARY KEY ([Id]),
         CONSTRAINT [FK_FileLogs_ProcessStatus] FOREIGN KEY (ProcessStatusId) REFERENCES ProcessStatus (Id),

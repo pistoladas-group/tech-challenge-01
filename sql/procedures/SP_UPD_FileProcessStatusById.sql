@@ -8,7 +8,7 @@ BEGIN
     UPDATE 
         Files
     SET
-        ProcessStatusId = @ProcessStatusId
+        Files.ProcessStatusId = @ProcessStatusId
     WHERE
         Files.Id = @Id;
 

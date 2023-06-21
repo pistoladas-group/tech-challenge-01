@@ -9,8 +9,8 @@ BEGIN
     UPDATE 
         FileLogs
     SET
-        ProcessStatusId = @ProcessStatusId,
-        FinishedAt = @FinishedAt
+        FileLogs.ProcessStatusId = @ProcessStatusId,
+        FileLogs.FinishedAt = @FinishedAt
     WHERE
         FileLogs.Id = @Id;
 

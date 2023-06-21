@@ -1,7 +1,5 @@
 using System.Net;
-
 using Microsoft.AspNetCore.Mvc;
-
 using TechBox.Api.Data;
 using TechBox.Api.Data.Dto;
 using TechBox.Api.Models;
@@ -86,29 +84,21 @@ public class FilesController : ControllerBase
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
     public async Task<IActionResult> UploadFile(IFormFile formFile)
     {
-        var fileNameSplit = formFile.FileName.Split(".");
+        var isAValidFile = _fileStorageService.ValidateFile(formFile);
 
-        if (fileNameSplit.Length <= 1)
+        if (!isAValidFile)
         {
-            return BadRequest(new ApiResponse(error: "invalid file extension"));
+            return BadRequest(new ApiResponse(error: "")); //TODO: return error sent by the service
         }
 
-        var extension = fileNameSplit[1].ToLower();
-        var isSupportedExtension = _fileStorageService.SupportedFileExtensions().Contains(extension);
-
-        if (!isSupportedExtension)
-        {
-            return BadRequest(new ApiResponse(error: "invalid file extension"));
-        }
-
-        var fileId = await _fileRepository.AddFileAsync(new AddFileDto()
+        var fileId = await _fileRepository.AddFileAsync(new AddFileDto
         {
             Name = formFile.FileName,
-            SizeInBytes = (int)formFile.Length, // TODO: Limitar tamanho do arquivo
+            SizeInBytes = (int)formFile.Length,
             ProcessStatusId = ProcessStatusEnum.Pending
         });
 
-        await _fileStorageService.UploadFile(formFile);
+        await _fileStorageService.UploadFileAsync(formFile);
 
         return CreatedAtAction(nameof(GetFileById), new { fileId }, new ApiResponse());
     }
@@ -116,13 +106,13 @@ public class FilesController : ControllerBase
     /// <summary>
     /// Delete a file
     /// </summary>
-    /// <response code="204">Operation succeeded with no response</response>
+    /// <response code="202">Operation accepted and being processed</response>
     /// <response code="404">The resource was not found</response>
     /// <response code="500">An internal error occurred</response>
     [HttpDelete("{fileId:guid}")]
     [Consumes("application/json")]
     [Produces("application/json")]
-    [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NoContent)]
+    [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.Accepted)] //TODO: https://www.rfc-editor.org/rfc/rfc9110.html#section-9.3.5
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
     public async Task<IActionResult> DeleteFile([FromRoute] Guid fileId)
@@ -134,7 +124,7 @@ public class FilesController : ControllerBase
             return NotFound(new ApiResponse("no file found"));
         }
 
-        // TODO: "Marcado" para remover, agora outro processo se encarregará de processar
+        // TODO: "Marcado" para remover, agora outro processo se encarregarï¿½ de processar
 
         var fileLogId = await _fileRepository.AddFileLogAsync(new AddFileLogDto()
         {
@@ -148,7 +138,7 @@ public class FilesController : ControllerBase
 
         await _fileRepository.UpdateFileLogToProcessingByIdAsync(fileLogId);
 
-        await _fileStorageService.DeleteFile(file.Name);
+        await _fileStorageService.DeleteFileAsync(file.Name);
 
         // TODO: Se sucesso:
         //              - Atualizar Files (Url = NULL, IsDeleted = 1, ProcessStatusId = Success)
@@ -164,6 +154,9 @@ public class FilesController : ControllerBase
 
         // TODO: #### End Background ####
 
-        return NoContent();
+        return Accepted(new ApiResponse());
     }
 }
+
+//TODO: https://github.com/serilog/serilog/wiki/Writing-Log-Events
+//TODO: https://github.com/serilog/serilog/wiki/Provided-Sinks

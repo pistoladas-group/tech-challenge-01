@@ -1,7 +1,6 @@
 using Azure.Identity;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
-
 using TechBox.Api.Configurations;
 
 namespace TechBox.Api.Services;
@@ -11,6 +10,7 @@ public class AzureFileStorageService : IFileStorageService
     private Uri _serviceUri { get; init; }
     private string _serviceContainerName { get; init; }
     private const string _supportedFileExtensions = "tif,tiff,bmp,jpg,jpeg,gif,png,eps,raw,cr2,nef,orf,sr2";
+    private const byte _fileNameAndExtensionSplitLength = 2;
 
     public AzureFileStorageService()
     {
@@ -31,7 +31,29 @@ public class AzureFileStorageService : IFileStorageService
         _serviceContainerName = serviceContainerName;
     }
 
-    public async Task UploadFile(IFormFile file)
+    public bool ValidateFile(IFormFile file) //TODO: criar classe de resposta com mensagens de erro
+    {
+        var fileNameSplit = file.FileName.Split('.');
+
+        if (fileNameSplit.Length != _fileNameAndExtensionSplitLength)
+        {
+            return false;
+        }
+
+        var extension = fileNameSplit[1].ToLower();
+        var isSupportedExtension = SupportedFileExtensions().Contains(extension);
+
+        if (!isSupportedExtension)
+        {
+            return false;
+        }
+        
+        // TODO: Limitar tamanho do arquivo
+
+        return true;
+    }
+
+    public async Task UploadFileAsync(IFormFile file)
     {
         //TODO: mudar status para processing e criar serviço de processamento (serviço deve validar variáveis de ambiente)
         //TODO: gravar o tipo de processamento como Inclusão
@@ -48,7 +70,7 @@ public class AzureFileStorageService : IFileStorageService
         }
     }
 
-    public async Task DeleteFile(string fileName)
+    public async Task DeleteFileAsync(string fileName)
     {
         // TODO: Daqui...
 
@@ -62,7 +84,7 @@ public class AzureFileStorageService : IFileStorageService
         // TODO: ... até aqui pode dar erro
     }
 
-    public IEnumerable<string> SupportedFileExtensions()
+    private static IEnumerable<string> SupportedFileExtensions()
     {
         return _supportedFileExtensions.Split(',');
     }

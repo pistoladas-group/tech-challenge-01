@@ -1,8 +1,8 @@
 namespace TechBox.Api.Services;
 
-public interface IFileStorageService
+public interface IRemoteFileStorageService
 {
     bool ValidateFile(IFormFile file);
-    Task UploadFileAsync(IFormFile file);
+    Task<Uri> UploadFileAsync(byte[] file, string fileName);
     Task DeleteFileAsync(string fileName);
 }

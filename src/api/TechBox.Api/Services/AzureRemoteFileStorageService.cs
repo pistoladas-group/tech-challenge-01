@@ -5,14 +5,14 @@ using TechBox.Api.Configurations;
 
 namespace TechBox.Api.Services;
 
-public class AzureFileStorageService : IFileStorageService
+public class AzureRemoteFileStorageService : IRemoteFileStorageService
 {
     private Uri _serviceUri { get; init; }
     private string _serviceContainerName { get; init; }
     private const string _supportedFileExtensions = "tif,tiff,bmp,jpg,jpeg,gif,png,eps,raw,cr2,nef,orf,sr2";
     private const byte _fileNameAndExtensionSplitLength = 2;
 
-    public AzureFileStorageService()
+    public AzureRemoteFileStorageService()
     {
         var serviceUri = Environment.GetEnvironmentVariable(EnvironmentVariables.StorageAccountUrl);
         var serviceContainerName = Environment.GetEnvironmentVariable(EnvironmentVariables.StorageAccountContainerName);
@@ -53,20 +53,26 @@ public class AzureFileStorageService : IFileStorageService
         return true;
     }
 
-    public async Task UploadFileAsync(IFormFile file)
+    public async Task<Uri> UploadFileAsync(byte[] file, string fileName)
     {
-        //TODO: mudar status para processing e criar serviço de processamento (serviço deve validar variáveis de ambiente)
-        //TODO: gravar o tipo de processamento como Inclusão
         var blobServiceClient = new BlobServiceClient(_serviceUri, new DefaultAzureCredential());
 
         var containerClient = blobServiceClient.GetBlobContainerClient(_serviceContainerName);
-        var blobClient = containerClient.GetBlobClient(file.FileName);
+        var blobClient = containerClient.GetBlobClient(fileName);
 
-        //TODO: aqui pode dar erro.
         //TODO: tentar passar o content type
-        await using (var stream = file.OpenReadStream())
+
+        var stream = new MemoryStream(file);
+        
+        try
         {
-                await blobClient.UploadAsync(stream);
+            await blobClient.UploadAsync(stream);
+            return blobClient.Uri;
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
         }
     }
 

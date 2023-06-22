@@ -10,7 +10,6 @@ BEGIN
         Files.IsDeleted,
         Files.CreatedAt,
         Files.Name,
-        Files.Extension,
         Files.SizeInBytes,
         Files.Url,
         Files.ProcessStatusId

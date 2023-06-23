@@ -14,7 +14,7 @@ builder.Services
     .AddSwaggerConfiguration()
     .AddEnvironmentVariables()
     .AddDataConfiguration()
-    .AddFileStorageConfiguration();
+    .AddInfrastructureConfiguration();
 
 var app = builder.Build();
 

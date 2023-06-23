@@ -483,3 +483,4 @@ $RECYCLE.BIN/
 .idea
 .env
 dist/
+**/tmp

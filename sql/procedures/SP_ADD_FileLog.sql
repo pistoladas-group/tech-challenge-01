@@ -6,9 +6,9 @@ CREATE OR ALTER PROCEDURE SP_ADD_FileLog
     @FileId UNIQUEIDENTIFIER,
     @ProcessStatusId TINYINT,
     @ProcessTypeId TINYINT,
-    @ErrorMessage VARCHAR(1000),
+    @ErrorMessage VARCHAR(1000) = NULL,
     @StartedAt DATETIME,
-    @FinishedAt DATETIME
+    @FinishedAt DATETIME = NULL
 )
 AS
 BEGIN

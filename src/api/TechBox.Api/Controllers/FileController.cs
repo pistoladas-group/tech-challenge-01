@@ -13,13 +13,15 @@ public class FilesController : ControllerBase
 {
     private readonly ILogger<FilesController> _logger;
     private readonly IFileRepository _fileRepository;
-    private readonly IFileStorageService _fileStorageService;
+    private readonly IRemoteFileStorageService _remoteFileStorageService;
+    private readonly ILocalFileStorageService _localFileStorageService;
 
-    public FilesController(ILogger<FilesController> logger, IFileRepository fileRepository, IFileStorageService fileStorageService)
+    public FilesController(ILogger<FilesController> logger, IFileRepository fileRepository, IRemoteFileStorageService remoteFileStorageService, ILocalFileStorageService localFileStorageService)
     {
         _logger = logger;
         _fileRepository = fileRepository;
-        _fileStorageService = fileStorageService;
+        _remoteFileStorageService = remoteFileStorageService;
+        _localFileStorageService = localFileStorageService;
     }
 
     /// <summary>
@@ -84,7 +86,7 @@ public class FilesController : ControllerBase
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
     public async Task<IActionResult> UploadFile(IFormFile formFile)
     {
-        var isAValidFile = _fileStorageService.ValidateFile(formFile);
+        var isAValidFile = _remoteFileStorageService.ValidateFile(formFile);
 
         if (!isAValidFile)
         {
@@ -97,8 +99,16 @@ public class FilesController : ControllerBase
             SizeInBytes = (int)formFile.Length,
             ProcessStatusId = ProcessStatusEnum.Pending
         });
+        
+        await _fileRepository.AddFileLogAsync(new AddFileLogDto
+        {
+            FileId = fileId,
+            ProcessStatusId = ProcessStatusEnum.Pending,
+            ProcessTypeId = ProcessTypesEnum.Upload,
+            StartedAt = DateTime.UtcNow
+        });
 
-        await _fileStorageService.UploadFileAsync(formFile);
+        _localFileStorageService.SaveFile(formFile, fileId);
 
         return CreatedAtAction(nameof(GetFileById), new { fileId }, new ApiResponse());
     }
@@ -112,7 +122,7 @@ public class FilesController : ControllerBase
     [HttpDelete("{fileId:guid}")]
     [Consumes("application/json")]
     [Produces("application/json")]
-    [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.Accepted)] //TODO: https://www.rfc-editor.org/rfc/rfc9110.html#section-9.3.5
+    [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.Accepted)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
     public async Task<IActionResult> DeleteFile([FromRoute] Guid fileId)
@@ -123,14 +133,15 @@ public class FilesController : ControllerBase
         {
             return NotFound(new ApiResponse("no file found"));
         }
-
-        // TODO: "Marcado" para remover, agora outro processo se encarregar� de processar
+        
+        //TODO: Atualizar o status do file para pendente 
 
         var fileLogId = await _fileRepository.AddFileLogAsync(new AddFileLogDto()
         {
             FileId = fileId,
             ProcessStatusId = ProcessStatusEnum.Pending,
-            ProcessTypeId = ProcessTypesEnum.Delete
+            ProcessTypeId = ProcessTypesEnum.Delete,
+            StartedAt = DateTime.UtcNow
         });
 
 
@@ -138,7 +149,7 @@ public class FilesController : ControllerBase
 
         await _fileRepository.UpdateFileLogToProcessingByIdAsync(fileLogId);
 
-        await _fileStorageService.DeleteFileAsync(file.Name);
+        await _remoteFileStorageService.DeleteFileAsync(file.Name);
 
         // TODO: Se sucesso:
         //              - Atualizar Files (Url = NULL, IsDeleted = 1, ProcessStatusId = Success)

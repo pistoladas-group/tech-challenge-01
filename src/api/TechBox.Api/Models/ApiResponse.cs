@@ -1,3 +1,5 @@
+using TechBox.Api.Services;
+
 namespace TechBox.Api.Models;
 
 public class ApiResponse
@@ -28,5 +30,17 @@ public class ApiResponse
     {
         Succeeded = false;
         Errors = errors;
+    }
+
+    public ApiResponse(IEnumerable<ServiceResultError> errors)
+    {
+        Succeeded = false;
+
+        Errors ??= new List<string>();
+
+        foreach (var error in errors)
+        {
+            Errors.Add(error.Message);
+        }
     }
 }

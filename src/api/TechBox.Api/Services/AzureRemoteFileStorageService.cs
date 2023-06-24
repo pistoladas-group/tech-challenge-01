@@ -31,13 +31,15 @@ public class AzureRemoteFileStorageService : IRemoteFileStorageService
         _serviceContainerName = serviceContainerName;
     }
 
-    public bool ValidateFile(IFormFile file) //TODO: criar classe de resposta com mensagens de erro
+    public ServiceResult ValidateFile(IFormFile file)
     {
+        var result = new ServiceResult();
+
         var fileNameSplit = file.FileName.Split('.');
 
         if (fileNameSplit.Length != _fileNameAndExtensionSplitLength)
         {
-            return false;
+            result.AddError(ApiErrors.InvalidFileName);
         }
 
         var extension = fileNameSplit[1].ToLower();
@@ -45,12 +47,15 @@ public class AzureRemoteFileStorageService : IRemoteFileStorageService
 
         if (!isSupportedExtension)
         {
-            return false;
+            result.AddError(ApiErrors.UnsupportedExtension);
         }
-        
-        // TODO: Limitar tamanho do arquivo
 
-        return true;
+        if (file.Length > 1048576 * 10) // 10 MB
+        {
+            result.AddError(ApiErrors.UnsupportedFileSize);
+        }
+
+        return result;
     }
 
     public async Task<Uri> UploadFileAsync(byte[] file, string fileName)
@@ -63,7 +68,7 @@ public class AzureRemoteFileStorageService : IRemoteFileStorageService
         //TODO: tentar passar o content type
 
         var stream = new MemoryStream(file);
-        
+
         try
         {
             await blobClient.UploadAsync(stream);

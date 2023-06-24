@@ -86,11 +86,11 @@ public class FilesController : ControllerBase
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
     public async Task<IActionResult> UploadFile(IFormFile formFile)
     {
-        var isAValidFile = _remoteFileStorageService.ValidateFile(formFile);
+        var result = _remoteFileStorageService.ValidateFile(formFile);
 
-        if (!isAValidFile)
+        if (!result.IsSuccess)
         {
-            return BadRequest(new ApiResponse(error: "")); //TODO: return error sent by the service
+            return BadRequest(new ApiResponse(result.Errors));
         }
 
         var fileId = await _fileRepository.AddFileAsync(new AddFileDto
@@ -99,7 +99,7 @@ public class FilesController : ControllerBase
             SizeInBytes = (int)formFile.Length,
             ProcessStatusId = ProcessStatusEnum.Pending
         });
-        
+
         await _fileRepository.AddFileLogAsync(new AddFileLogDto
         {
             FileId = fileId,
@@ -133,7 +133,7 @@ public class FilesController : ControllerBase
         {
             return NotFound(new ApiResponse("no file found"));
         }
-        
+
         //TODO: Atualizar o status do file para pendente 
 
         var fileLogId = await _fileRepository.AddFileLogAsync(new AddFileLogDto()

@@ -31,7 +31,8 @@ BEGIN
         [FinishedAt] DATETIME NULL,
         CONSTRAINT [PK_FileLogs] PRIMARY KEY ([Id]),
         CONSTRAINT [FK_FileLogs_ProcessStatus] FOREIGN KEY (ProcessStatusId) REFERENCES ProcessStatus (Id),
-        CONSTRAINT [FK_FileLogs_ProcessTypes] FOREIGN KEY (ProcessTypeId) REFERENCES ProcessTypes (Id)
+        CONSTRAINT [FK_FileLogs_ProcessTypes] FOREIGN KEY (ProcessTypeId) REFERENCES ProcessTypes (Id),
+        CONSTRAINT [FK_FileLogs_FileId] FOREIGN KEY (FileId) REFERENCES Files(Id)
     );
 END;
 GO

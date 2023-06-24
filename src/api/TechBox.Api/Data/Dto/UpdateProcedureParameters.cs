@@ -2,10 +2,10 @@
 
 public class UpdateProcedureParameters
 {
-    public Guid Id { get; init; }
+    public Guid FileId { get; init; }
 
-    public UpdateProcedureParameters(Guid id)
+    public UpdateProcedureParameters(Guid fileId)
     {
-        Id = id;
+        FileId = fileId;
     }
 }

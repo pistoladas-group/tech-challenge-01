@@ -1,7 +1,7 @@
-CREATE OR ALTER PROCEDURE SP_UPD_FileLogToFailedById
+CREATE OR ALTER PROCEDURE SP_UPD_FileLogToFailedByFileIdAndProcessType
 (
-    @Id UNIQUEIDENTIFIER,
-    @ProcessStatusId TINYINT,
+    @FileId UNIQUEIDENTIFIER,
+    @ProcessTypeId TINYINT,
     @FinishedAt DATETIME,
     @ErrorMessage VARCHAR(1000)
 )
@@ -10,11 +10,16 @@ BEGIN
     UPDATE 
         FileLogs
     SET
-        FileLogs.ProcessStatusId = @ProcessStatusId,
+        FileLogs.ProcessStatusId = 3, --Failed
         FileLogs.FinishedAt = @FinishedAt,
         FileLogs.ErrorMessage = @ErrorMessage
+    FROM 
+        FileLogs
+    INNER JOIN
+        Files ON FileLogs.FileId = Files.Id
     WHERE
-        FileLogs.Id = @Id;
+        Files.Id = @FileId AND
+        FileLogs.ProcessTypeId = @ProcessTypeId;
 
     SELECT @@ROWCOUNT 'AffectedRows';
 END;

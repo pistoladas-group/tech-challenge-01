@@ -11,7 +11,7 @@ public interface IFileRepository
     Task<int> DeleteFileByIdAsync(Guid fileId);
     Task<int> UpdateFileProcessStatusByIdAsync(Guid fileId, ProcessStatusEnum processStatusId);
     Task<Guid> AddFileLogAsync(AddFileLogDto fileLogDto);
-    Task<int> UpdateFileLogToProcessingByIdAsync(Guid fileLogId);
-    Task<int> UpdateFileLogToSuccessByIdAsync(Guid fileLogId);
-    Task<int> UpdateFileLogToFailedByIdAsync(Guid fileLogId, string errorMessage);
+    Task<int> UpdateFileLogToProcessingByFileIdAsync(Guid fileId, ProcessTypesEnum processTypesId);
+    Task<int> UpdateFileLogToSuccessByFileIdAsync(Guid fileId, ProcessTypesEnum processTypesId);
+    Task<int> UpdateFileLogToFailedByIdAsync(Guid fileId, ProcessTypesEnum processTypesId, string errorMessage);
 }

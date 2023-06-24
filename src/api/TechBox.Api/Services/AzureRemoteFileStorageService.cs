@@ -59,20 +59,22 @@ public class AzureRemoteFileStorageService : IRemoteFileStorageService
         return result;
     }
 
-    public async Task<Uri> UploadFileAsync(byte[] file, string fileName)
+    public async Task<Uri> UploadFileAsync(byte[] file, string fileName, string contentType)
     {
         var blobServiceClient = new BlobServiceClient(_serviceUri, new DefaultAzureCredential());
 
         var containerClient = blobServiceClient.GetBlobContainerClient(_serviceContainerName);
         var blobClient = containerClient.GetBlobClient(fileName);
 
-        //TODO: tentar passar o content type
-
         var stream = new MemoryStream(file);
 
         try
         {
-            await blobClient.UploadAsync(stream);
+            await blobClient.UploadAsync(stream, new BlobUploadOptions
+            {
+                HttpHeaders = new BlobHttpHeaders { ContentType = contentType }
+            });
+
             return blobClient.Uri;
         }
         catch (Exception e)

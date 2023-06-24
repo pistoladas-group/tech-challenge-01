@@ -8,5 +8,6 @@ public class FileDto
     public string Name { get; set; }
     public int SizeInBytes { get; set; }
     public string? Url { get; set; }
+    public string ContentType { get; set; }
     public byte ProcessStatusId { get; set; }
 }

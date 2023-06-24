@@ -97,6 +97,7 @@ public class FilesController : ControllerBase
         {
             Name = formFile.FileName,
             SizeInBytes = (int)formFile.Length,
+            ContentType = formFile.ContentType,
             ProcessStatusId = ProcessStatusEnum.Pending
         });
 

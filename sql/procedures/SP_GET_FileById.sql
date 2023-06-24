@@ -11,7 +11,8 @@ BEGIN
         Files.Name,
         Files.SizeInBytes,
         Files.Url,
-        Files.ProcessStatusId
+        Files.ProcessStatusId,
+        Files.ContentType
     FROM
         Files
     WHERE

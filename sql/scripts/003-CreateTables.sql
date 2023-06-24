@@ -11,6 +11,7 @@ BEGIN
         [Name] VARCHAR(100) NOT NULL,
         [SizeInBytes] INT NOT NULL,
         [Url] VARCHAR(2500) NULL,
+        [ContentType] VARCHAR(100) NOT NULL,
         [ProcessStatusId] TINYINT NOT NULL,
         CONSTRAINT [PK_Files] PRIMARY KEY ([Id]),
         CONSTRAINT [FK_Files_ProcessStatus] FOREIGN KEY (ProcessStatusId) REFERENCES ProcessStatus (Id)

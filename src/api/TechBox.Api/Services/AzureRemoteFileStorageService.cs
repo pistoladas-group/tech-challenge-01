@@ -1,6 +1,7 @@
 using Azure.Identity;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
+
 using TechBox.Api.Configurations;
 
 namespace TechBox.Api.Services;
@@ -83,16 +84,12 @@ public class AzureRemoteFileStorageService : IRemoteFileStorageService
 
     public async Task DeleteFileAsync(string fileName)
     {
-        // TODO: Daqui...
-
         var blobServiceClient = new BlobServiceClient(_serviceUri, new DefaultAzureCredential());
 
         var containerClient = blobServiceClient.GetBlobContainerClient(_serviceContainerName);
         var blobClient = containerClient.GetBlobClient(fileName);
 
         await blobClient.DeleteIfExistsAsync(DeleteSnapshotsOption.IncludeSnapshots);
-
-        // TODO: ... até aqui pode dar erro
     }
 
     private static IEnumerable<string> SupportedFileExtensions()

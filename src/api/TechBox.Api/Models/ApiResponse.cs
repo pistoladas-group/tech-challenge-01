@@ -1,4 +1,4 @@
-using TechBox.Api.Services;
+using TechBox.Api.Common;
 
 namespace TechBox.Api.Models;
 
@@ -32,7 +32,7 @@ public class ApiResponse
         Errors = errors;
     }
 
-    public ApiResponse(IEnumerable<ServiceResultError> errors)
+    public ApiResponse(IEnumerable<ExecutionResultError> errors)
     {
         Succeeded = false;
 

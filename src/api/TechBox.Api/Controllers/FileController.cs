@@ -134,7 +134,7 @@ public class FilesController : ControllerBase
             return NotFound(new ApiResponse("no file found"));
         }
 
-        //TODO: Atualizar o status do file para pendente 
+        await _fileRepository.UpdateFileProcessStatusByIdAsync(fileId, ProcessStatusEnum.Pending);
 
         var fileLogId = await _fileRepository.AddFileLogAsync(new AddFileLogDto()
         {
@@ -168,6 +168,3 @@ public class FilesController : ControllerBase
         return Accepted(new ApiResponse());
     }
 }
-
-//TODO: https://github.com/serilog/serilog/wiki/Writing-Log-Events
-//TODO: https://github.com/serilog/serilog/wiki/Provided-Sinks

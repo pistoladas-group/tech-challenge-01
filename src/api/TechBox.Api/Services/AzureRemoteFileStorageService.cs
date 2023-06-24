@@ -1,7 +1,7 @@
 using Azure.Identity;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
-
+using TechBox.Api.Common;
 using TechBox.Api.Configurations;
 
 namespace TechBox.Api.Services;
@@ -32,15 +32,15 @@ public class AzureRemoteFileStorageService : IRemoteFileStorageService
         _serviceContainerName = serviceContainerName;
     }
 
-    public ServiceResult ValidateFile(IFormFile file)
+    public ExecutionResult ValidateFile(IFormFile file)
     {
-        var result = new ServiceResult();
+        var result = new ExecutionResult();
 
         var fileNameSplit = file.FileName.Split('.');
 
         if (fileNameSplit.Length != _fileNameAndExtensionSplitLength)
         {
-            result.AddError(ApiErrors.InvalidFileName);
+            result.AddError(ExecutionErrors.InvalidFileName);
         }
 
         var extension = fileNameSplit[1].ToLower();
@@ -48,12 +48,12 @@ public class AzureRemoteFileStorageService : IRemoteFileStorageService
 
         if (!isSupportedExtension)
         {
-            result.AddError(ApiErrors.UnsupportedExtension);
+            result.AddError(ExecutionErrors.UnsupportedExtension);
         }
 
         if (file.Length > 1048576 * 10) // 10 MB
         {
-            result.AddError(ApiErrors.UnsupportedFileSize);
+            result.AddError(ExecutionErrors.UnsupportedFileSize);
         }
 
         return result;

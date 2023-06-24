@@ -1,6 +1,3 @@
-USE TechBox
-GO
-
 IF OBJECT_ID(N'Files') IS NULL
 BEGIN
     CREATE TABLE [Files] (
@@ -27,8 +24,8 @@ BEGIN
         [CreatedAt] DATETIME NOT NULL,
 
         [FileId] UNIQUEIDENTIFIER NOT NULL,
-        [ProcessStatusId] TINYINT NOT NULL,
         [ProcessTypeId] TINYINT NOT NULL,
+        [ProcessStatusId] TINYINT NOT NULL,
         [ErrorMessage] VARCHAR(1000) NULL,
         [StartedAt] DATETIME NULL,
         [FinishedAt] DATETIME NULL,

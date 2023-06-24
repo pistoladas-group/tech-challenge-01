@@ -28,21 +28,27 @@ public class FilesController : ControllerBase
     /// Get all files
     /// </summary>
     /// <response code="200">Returns the resource data</response>
+    /// <response code="400">There is a problem with the request</response>
     /// <response code="500">An internal error occurred</response>
     [HttpGet("")]
     [Consumes("application/json")]
     [Produces("application/json")]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.OK)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-    public async Task<IActionResult> GetAllFiles()
+    public async Task<IActionResult> GetAllFiles([FromQuery] int pageNumber, [FromQuery] int pageSize)
     {
-        var storedFiles = await _fileRepository.ListFilesAsync(1, 10);
+        if (pageNumber <= 0 || pageSize <= 0)
+        {
+            return BadRequest(new ApiResponse(error: "page number and page size must be greater than 0."));
+        }
+        
+        var storedFiles = await _fileRepository.ListFilesAsync(pageNumber, pageSize);
 
         return Ok(new ApiResponse(data: storedFiles));
     }
 
     /// <summary>
-    /// Get file by id
+    /// Get a file by id
     /// </summary>
     /// <response code="200">Returns the resource data</response>
     /// <response code="400">There is a problem with the request</response>
@@ -59,14 +65,14 @@ public class FilesController : ControllerBase
     {
         if (fileId == Guid.Empty)
         {
-            return BadRequest(new ApiResponse());
+            return BadRequest(new ApiResponse(error: "Invalid fileId"));
         }
 
         var storedFile = await _fileRepository.GetFileByIdAsync(fileId);
 
         if (storedFile is null)
         {
-            return NotFound(new ApiResponse());
+            return NotFound(new ApiResponse(error: "File not found"));
         }
 
         return Ok(new ApiResponse(data: storedFile));
@@ -84,7 +90,7 @@ public class FilesController : ControllerBase
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.Created)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-    public async Task<IActionResult> UploadFile(IFormFile formFile)
+    public async Task<IActionResult> UploadFile([FromQuery] Guid? fileId, IFormFile formFile)
     {
         var result = _remoteFileStorageService.ValidateFile(formFile);
 
@@ -93,29 +99,19 @@ public class FilesController : ControllerBase
             return BadRequest(new ApiResponse(result.Errors));
         }
 
-        var fileId = await _fileRepository.AddFileAsync(new AddFileDto
-        {
-            Name = formFile.FileName,
-            SizeInBytes = (int)formFile.Length,
-            ContentType = formFile.ContentType,
-            ProcessStatusId = ProcessStatusEnum.Pending
-        });
+        var fileToAdd = new AddFileDto(fileId, formFile.FileName, formFile.Length, formFile.ContentType);
+        
+        var addedFileId = await _fileRepository.AddFileAsync(fileToAdd);
 
-        await _fileRepository.AddFileLogAsync(new AddFileLogDto
-        {
-            FileId = fileId,
-            ProcessStatusId = ProcessStatusEnum.Pending,
-            ProcessTypeId = ProcessTypesEnum.Upload,
-            StartedAt = DateTime.UtcNow
-        });
+        await _fileRepository.AddFileLogAsync(new AddFileLogDto(null, addedFileId, ProcessTypesEnum.Upload));
 
-        _localFileStorageService.SaveFile(formFile, fileId);
+        _localFileStorageService.SaveFile(formFile, addedFileId);
 
-        return CreatedAtAction(nameof(GetFileById), new { fileId }, new ApiResponse());
+        return CreatedAtAction(nameof(GetFileById), new { fileId = addedFileId }, new ApiResponse());
     }
 
     /// <summary>
-    /// Delete a file
+    /// Delete a file by id
     /// </summary>
     /// <response code="202">Operation accepted and being processed</response>
     /// <response code="404">The resource was not found</response>
@@ -132,40 +128,13 @@ public class FilesController : ControllerBase
 
         if (file is null)
         {
-            return NotFound(new ApiResponse("no file found"));
+            return NotFound(new ApiResponse(error: "no file found"));
         }
 
         await _fileRepository.UpdateFileProcessStatusByIdAsync(fileId, ProcessStatusEnum.Pending);
 
-        var fileLogId = await _fileRepository.AddFileLogAsync(new AddFileLogDto()
-        {
-            FileId = fileId,
-            ProcessStatusId = ProcessStatusEnum.Pending,
-            ProcessTypeId = ProcessTypesEnum.Delete,
-            StartedAt = DateTime.UtcNow
-        });
-
-
-        // TODO: #### Begin Background ####
-
-        await _fileRepository.UpdateFileLogToProcessingByIdAsync(fileLogId);
-
-        await _remoteFileStorageService.DeleteFileAsync(file.Name);
-
-        // TODO: Se sucesso:
-        //              - Atualizar Files (Url = NULL, IsDeleted = 1, ProcessStatusId = Success)
-        //              - Atualizar FileLogs (ProcessStatusId = Success, FinishedAt = DateTime.UtcNow)
-        await _fileRepository.UpdateFileLogToSuccessByIdAsync(fileLogId);
-
-        await _fileRepository.DeleteFileByIdAsync(fileId);
-
-        // TODO: Se erro:
-        //              - Atualizar Files (ProcessStatusId = Failed)
-        //              - Atualizar FileLogs (ProcessStatusId = Failed, FinishedAt = DateTime.UtcNow, ErrorMessage = "<error>")
-        // await _fileRepository.UpdateFileLogToFailedByIdAsync(fileLogId, "An error ocurred");
-
-        // TODO: #### End Background ####
-
+        await _fileRepository.AddFileLogAsync(new AddFileLogDto(null, fileId, ProcessTypesEnum.Delete));
+        
         return Accepted(new ApiResponse());
     }
 }

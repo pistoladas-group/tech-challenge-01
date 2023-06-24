@@ -4,11 +4,8 @@ CREATE OR ALTER PROCEDURE SP_ADD_FileLog
     @IsDeleted BIT,
     @CreatedAt DATETIME,
     @FileId UNIQUEIDENTIFIER,
-    @ProcessStatusId TINYINT,
     @ProcessTypeId TINYINT,
-    @ErrorMessage VARCHAR(1000) = NULL,
-    @StartedAt DATETIME,
-    @FinishedAt DATETIME = NULL
+    @ProcessStatusId TINYINT
 )
 AS
 BEGIN
@@ -19,10 +16,7 @@ BEGIN
         CreatedAt, 
         FileId,
         ProcessStatusId,
-        ProcessTypeId,
-        ErrorMessage,
-        StartedAt,
-        FinishedAt
+        ProcessTypeId
     )
     VALUES 
     (
@@ -31,10 +25,7 @@ BEGIN
         @CreatedAt, 
         @FileId,
         @ProcessStatusId,
-        @ProcessTypeId,
-        @ErrorMessage,
-        @StartedAt,
-        @FinishedAt
+        @ProcessTypeId
     );
 
     SELECT @@ROWCOUNT 'AffectedRows';

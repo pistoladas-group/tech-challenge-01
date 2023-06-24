@@ -1,7 +1,4 @@
-﻿USE TechBox
-GO
-
-BEGIN
+﻿BEGIN
 	-- ProcessStatus
     DECLARE @Id TINYINT = 1;
     DECLARE @Name VARCHAR(50) = 'Pending';

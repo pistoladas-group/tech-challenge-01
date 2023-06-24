@@ -9,5 +9,7 @@ public class UpdateFileLogToSuccessByIdDto : UpdateProcedureParameters
 
     public UpdateFileLogToSuccessByIdDto(Guid id) : base(id)
     {
+        ProcessStatusId = ProcessStatusEnum.Success;
+        FinishedAt = DateTime.UtcNow;
     }
 }

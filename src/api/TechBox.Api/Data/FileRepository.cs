@@ -94,11 +94,7 @@ public class FileRepository : IFileRepository
     {
         var procedureName = "SP_UPD_FileLogToProcessingById";
 
-        var affectedRows = await _storedProcedureHandler.ExecuteUpdateAsync(procedureName, new UpdateFileLogToProcessingByIdDto(fileLogId)
-        {
-            ProcessStatusId = ProcessStatusEnum.Processing,
-            StartedAt = DateTime.UtcNow
-        });
+        var affectedRows = await _storedProcedureHandler.ExecuteUpdateAsync(procedureName, new UpdateFileLogToProcessingByIdDto(fileLogId));
 
         if (affectedRows <= 0)
         {
@@ -112,11 +108,7 @@ public class FileRepository : IFileRepository
     {
         var procedureName = "SP_UPD_FileLogToSuccessById";
 
-        var affectedRows = await _storedProcedureHandler.ExecuteUpdateAsync(procedureName, new UpdateFileLogToSuccessByIdDto(fileLogId)
-        {
-            ProcessStatusId = ProcessStatusEnum.Success,
-            FinishedAt = DateTime.UtcNow
-        });
+        var affectedRows = await _storedProcedureHandler.ExecuteUpdateAsync(procedureName, new UpdateFileLogToSuccessByIdDto(fileLogId));
 
         if (affectedRows <= 0)
         {
@@ -130,12 +122,7 @@ public class FileRepository : IFileRepository
     {
         var procedureName = "SP_UPD_FileLogToFailedById";
 
-        var affectedRows = await _storedProcedureHandler.ExecuteUpdateAsync(procedureName, new UpdateFileLogToFailedByIdDto(fileLogId)
-        {
-            ProcessStatusId = ProcessStatusEnum.Failed,
-            FinishedAt = DateTime.UtcNow,
-            ErrorMessage = errorMessage
-        });
+        var affectedRows = await _storedProcedureHandler.ExecuteUpdateAsync(procedureName, new UpdateFileLogToFailedByIdDto(fileLogId, errorMessage));
 
         if (affectedRows <= 0)
         {

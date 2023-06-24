@@ -7,7 +7,11 @@ public class AddFileLogDto : AddProcedureParameters
     public Guid FileId { get; set; }
     public ProcessStatusEnum ProcessStatusId { get; set; }
     public ProcessTypesEnum ProcessTypeId { get; set; }
-    public string? ErrorMessage { get; set; }
-    public DateTime? StartedAt { get; set; }
-    public string? FinishedAt { get; set; }
+
+    public AddFileLogDto(Guid? id, Guid fileId, ProcessTypesEnum processTypeId) : base(id)
+    {
+        FileId = fileId;
+        ProcessStatusId = ProcessStatusEnum.Pending;
+        ProcessTypeId = processTypeId;
+    }
 }

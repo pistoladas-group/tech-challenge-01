@@ -5,7 +5,6 @@ CREATE OR ALTER PROCEDURE SP_ADD_File
     @CreatedAt DATETIME,
     @Name VARCHAR(100),
     @SizeInBytes INT,
-    @Url VARCHAR(2500),
     @ContentType VARCHAR(100),
     @ProcessStatusId TINYINT
 )
@@ -18,7 +17,6 @@ BEGIN
         CreatedAt, 
         Name, 
         SizeInBytes, 
-        Url,
         ContentType, 
         ProcessStatusId
     )
@@ -29,7 +27,6 @@ BEGIN
         @CreatedAt,
         @Name,
         @SizeInBytes,
-        @Url,
         @ContentType,
         @ProcessStatusId
     );

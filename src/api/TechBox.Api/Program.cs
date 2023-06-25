@@ -13,6 +13,7 @@ builder.Services
     .AddEndpointsApiExplorer()
     .AddSwaggerConfiguration()
     .AddEnvironmentVariables()
+    .AddLoggingConfiguration(builder.Host)
     .AddDataConfiguration()
     .AddInfrastructureConfiguration();
 

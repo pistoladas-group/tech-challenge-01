@@ -9,7 +9,7 @@ public class AddFileDto : AddProcedureParameters
     public string ContentType { get; set; }
     public ProcessStatusEnum ProcessStatusId { get; set; }
     
-    public AddFileDto(Guid? id, string name, long sizeInBytes, string contentType) : base(id)
+    public AddFileDto(string name, long sizeInBytes, string contentType)
     {
         Name = name;
         SizeInBytes = sizeInBytes;

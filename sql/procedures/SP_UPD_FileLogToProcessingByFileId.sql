@@ -1,7 +1,6 @@
-CREATE OR ALTER PROCEDURE SP_UPD_FileLogToProcessingByFileIdAndProcessType
+CREATE OR ALTER PROCEDURE SP_UPD_FileLogToProcessingByFileId
 (
     @FileId UNIQUEIDENTIFIER,
-    @ProcessTypeId TINYINT,
     @StartedAt DATETIME
 )
 AS
@@ -16,8 +15,7 @@ BEGIN
     INNER JOIN
         Files ON FileLogs.FileId = Files.Id
     WHERE
-        Files.Id = @FileId AND
-        FileLogs.ProcessTypeId = @ProcessTypeId;
+        Files.Id = @FileId;
 
     SELECT @@ROWCOUNT 'AffectedRows';
 END;

@@ -1,4 +1,4 @@
-CREATE OR ALTER PROCEDURE SP_UPD_FileLogToSuccessByFileIdAndProcessType
+CREATE OR ALTER PROCEDURE SP_UPD_FileLogToSuccessByFileIdAndProcessTypeId
 (
     @FileId UNIQUEIDENTIFIER,
     @ProcessTypeId TINYINT,

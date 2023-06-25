@@ -11,14 +11,12 @@ namespace TechBox.Api.Controllers;
 [Route("api/files")]
 public class FilesController : ControllerBase
 {
-    private readonly ILogger<FilesController> _logger;
     private readonly IFileRepository _fileRepository;
     private readonly IRemoteFileStorageService _remoteFileStorageService;
     private readonly ILocalFileStorageService _localFileStorageService;
 
-    public FilesController(ILogger<FilesController> logger, IFileRepository fileRepository, IRemoteFileStorageService remoteFileStorageService, ILocalFileStorageService localFileStorageService)
+    public FilesController(IFileRepository fileRepository, IRemoteFileStorageService remoteFileStorageService, ILocalFileStorageService localFileStorageService)
     {
-        _logger = logger;
         _fileRepository = fileRepository;
         _remoteFileStorageService = remoteFileStorageService;
         _localFileStorageService = localFileStorageService;
@@ -90,7 +88,7 @@ public class FilesController : ControllerBase
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.Created)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-    public async Task<IActionResult> UploadFile([FromQuery] Guid? fileId, IFormFile formFile)
+    public async Task<IActionResult> UploadFile(IFormFile formFile)
     {
         var result = _remoteFileStorageService.ValidateFile(formFile);
 
@@ -98,12 +96,17 @@ public class FilesController : ControllerBase
         {
             return BadRequest(new ApiResponse(result.Errors));
         }
-
-        var fileToAdd = new AddFileDto(fileId, formFile.FileName, formFile.Length, formFile.ContentType);
+        
+        var fileToAdd = new AddFileDto(formFile.FileName, formFile.Length, formFile.ContentType);
         
         var addedFileId = await _fileRepository.AddFileAsync(fileToAdd);
 
-        await _fileRepository.AddFileLogAsync(new AddFileLogDto(null, addedFileId, ProcessTypesEnum.Upload));
+        var existingFileLog = await _fileRepository.GetFileLogByFileIdAndProcessTypeIdAsync(addedFileId, ProcessTypesEnum.Upload);
+        
+        if (existingFileLog is null)
+        {
+            await _fileRepository.AddFileLogAsync(new AddFileLogDto(addedFileId, ProcessTypesEnum.Upload));
+        }
 
         _localFileStorageService.SaveFile(formFile, addedFileId);
 
@@ -133,7 +136,12 @@ public class FilesController : ControllerBase
 
         await _fileRepository.UpdateFileProcessStatusByIdAsync(fileId, ProcessStatusEnum.Pending);
 
-        await _fileRepository.AddFileLogAsync(new AddFileLogDto(null, fileId, ProcessTypesEnum.Delete));
+        var existingFileLog = await _fileRepository.GetFileLogByFileIdAndProcessTypeIdAsync(fileId, ProcessTypesEnum.Delete);
+        
+        if (existingFileLog is null)
+        {
+            await _fileRepository.AddFileLogAsync(new AddFileLogDto(fileId, ProcessTypesEnum.Delete));
+        }
         
         return Accepted(new ApiResponse());
     }

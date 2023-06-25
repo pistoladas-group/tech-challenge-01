@@ -29,12 +29,12 @@ public class LocalFileStorageService : ILocalFileStorageService
         return true;
     }
 
-    public bool DeleteFile(Guid fileId, string fileName)
+    public void DeleteFile(Guid fileId, string fileName)
     {
         if (!File.Exists($"{_tempDirectoryName}/{fileId}/{fileName}"))
         {
             //TODO: LOG 
-            return true;
+            return;
         }
 
         try
@@ -46,8 +46,6 @@ public class LocalFileStorageService : ILocalFileStorageService
         {
             //TODO: LOG
         }
-        
-        return true;
     }
     
     public byte[] GetFileById(Guid fileId, string fileName)

@@ -1,6 +1,6 @@
 CREATE OR ALTER PROCEDURE SP_UPD_FileProcessStatusById
 (
-    @Id UNIQUEIDENTIFIER,
+    @FileId UNIQUEIDENTIFIER,
     @ProcessStatusId TINYINT
 )
 AS
@@ -10,7 +10,7 @@ BEGIN
     SET
         Files.ProcessStatusId = @ProcessStatusId
     WHERE
-        Files.Id = @Id;
+        Files.Id = @FileId;
 
     SELECT @@ROWCOUNT 'AffectedRows';
 END;

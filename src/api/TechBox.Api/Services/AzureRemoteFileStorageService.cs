@@ -1,3 +1,4 @@
+using Azure;
 using Azure.Identity;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
@@ -12,6 +13,7 @@ public class AzureRemoteFileStorageService : IRemoteFileStorageService
     private string _serviceContainerName { get; init; }
     private const string _supportedFileExtensions = "tif,tiff,bmp,jpg,jpeg,gif,png,eps,raw,cr2,nef,orf,sr2";
     private const byte _fileNameAndExtensionSplitLength = 2;
+    private const int MaxFileSize = 1048576 * 10; // 10 MB
 
     public AzureRemoteFileStorageService()
     {
@@ -51,7 +53,7 @@ public class AzureRemoteFileStorageService : IRemoteFileStorageService
             result.AddError(ExecutionErrors.UnsupportedExtension);
         }
 
-        if (file.Length > 1048576 * 10) // 10 MB
+        if (file.Length > MaxFileSize)
         {
             result.AddError(ExecutionErrors.UnsupportedFileSize);
         }

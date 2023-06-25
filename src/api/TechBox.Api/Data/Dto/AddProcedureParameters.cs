@@ -6,9 +6,9 @@ public class AddProcedureParameters
     public bool IsDeleted { get; init; }
     public DateTime CreatedAt { get; init; }
 
-    protected AddProcedureParameters(Guid? id)
+    protected AddProcedureParameters()
     {
-        Id = id ?? Guid.NewGuid();
+        Id = Guid.NewGuid();
         IsDeleted = false;
         CreatedAt = DateTime.UtcNow;
     }

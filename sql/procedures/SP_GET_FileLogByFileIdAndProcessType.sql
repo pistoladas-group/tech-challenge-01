@@ -1,6 +1,7 @@
-CREATE OR ALTER PROCEDURE SP_GET_FileLogById
+CREATE OR ALTER PROCEDURE SP_GET_FileLogByFileIdAndProcessType
 (
-	@Id UNIQUEIDENTIFIER
+	@Id UNIQUEIDENTIFIER,
+	@ProcessTypeId TINYINT
 )
 AS
 BEGIN
@@ -18,5 +19,6 @@ BEGIN
         FileLogs
     WHERE
         FileLogs.IsDeleted = 0 AND
-        FileLogs.Id = @Id
+        FileLogs.FileId = @Id AND
+        FileLogs.ProcessTypeId = @ProcessTypeId
 END;

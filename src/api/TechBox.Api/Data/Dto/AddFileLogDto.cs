@@ -8,7 +8,7 @@ public class AddFileLogDto : AddProcedureParameters
     public ProcessStatusEnum ProcessStatusId { get; set; }
     public ProcessTypesEnum ProcessTypeId { get; set; }
 
-    public AddFileLogDto(Guid? id, Guid fileId, ProcessTypesEnum processTypeId) : base(id)
+    public AddFileLogDto(Guid fileId, ProcessTypesEnum processTypeId)
     {
         FileId = fileId;
         ProcessStatusId = ProcessStatusEnum.Pending;

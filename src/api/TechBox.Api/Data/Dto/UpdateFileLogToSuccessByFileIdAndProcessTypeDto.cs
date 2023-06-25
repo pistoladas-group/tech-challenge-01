@@ -5,11 +5,11 @@ namespace TechBox.Api.Data.Dto;
 public class UpdateFileLogToSuccessByFileIdAndProcessTypeDto : UpdateProcedureParameters
 {
     public DateTime FinishedAt { get; set; }
-    public ProcessTypesEnum ProcessTypesId { get; set; }
+    public ProcessTypesEnum ProcessTypeId { get; set; }
 
-    public UpdateFileLogToSuccessByFileIdAndProcessTypeDto(Guid fileId, ProcessTypesEnum processTypesId) : base(fileId)
+    public UpdateFileLogToSuccessByFileIdAndProcessTypeDto(Guid fileId, ProcessTypesEnum processTypeId) : base(fileId)
     {
-        ProcessTypesId = processTypesId;
         FinishedAt = DateTime.UtcNow;
+        ProcessTypeId = processTypeId;
     }
 }

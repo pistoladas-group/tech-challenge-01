@@ -1,39 +1,51 @@
-using System.Net;
+using Serilog;
 
 namespace TechBox.Api.Services;
 
 public class LocalFileStorageService : ILocalFileStorageService
 {
     private const string _tempDirectoryName = "tmp";
-    
+
     public LocalFileStorageService()
     {
-        if (!Directory.Exists(_tempDirectoryName))
+        try
         {
-            Directory.CreateDirectory(_tempDirectoryName);
-        }    
+            if (!Directory.Exists(_tempDirectoryName))
+            {
+                Directory.CreateDirectory(_tempDirectoryName);
+            }    
+        }
+        catch (Exception e)
+        {
+            Log.Fatal(e, "Error while trying to create the {Temp} folder.", _tempDirectoryName);
+        }
     }
-    
-    public bool SaveFile(IFormFile file, Guid fileId)
+
+    public void SaveFile(IFormFile file, Guid fileId)
     {
         var fileStream = new MemoryStream();
         file.CopyTo(fileStream);
 
-        if (!Directory.Exists($"{_tempDirectoryName}/{fileId}"))
+        try
         {
-            Directory.CreateDirectory($"{_tempDirectoryName}/{fileId}");
-        }
-        
-        File.WriteAllBytes($"{_tempDirectoryName}/{fileId}/{file.FileName}", fileStream.ToArray());
+            if (!Directory.Exists($"{_tempDirectoryName}/{fileId}"))
+            {
+                Directory.CreateDirectory($"{_tempDirectoryName}/{fileId}");
+            }
 
-        return true;
+            File.WriteAllBytes($"{_tempDirectoryName}/{fileId}/{file.FileName}", fileStream.ToArray());
+        }
+        catch (Exception e)
+        {
+            Log.Error(e, "Error while trying to create the directory and write the file {File}.", fileId);
+        }
     }
 
     public void DeleteFile(Guid fileId, string fileName)
     {
         if (!File.Exists($"{_tempDirectoryName}/{fileId}/{fileName}"))
         {
-            //TODO: LOG 
+            Log.Warning("File {File} not found while trying to delete. Ignoring.", fileId); 
             return;
         }
 
@@ -44,7 +56,7 @@ public class LocalFileStorageService : ILocalFileStorageService
         }
         catch (Exception e)
         {
-            //TODO: LOG
+            Log.Error(e, "Error while trying to delete the file {File} and exclude the directory locally.", fileId);
         }
     }
     
@@ -52,9 +64,18 @@ public class LocalFileStorageService : ILocalFileStorageService
     {
         if (!File.Exists($"{_tempDirectoryName}/{fileId}/{fileName}"))
         {
-            //LOG
+            Log.Error("Unable to return file bytes once the file {File} does not exists locally.", fileId);
+            throw new ApplicationException($"The file {fileId} does not exists locally");
         }
 
-        return File.ReadAllBytes($"{_tempDirectoryName}/{fileId}/{fileName}");
+        try
+        {
+            return File.ReadAllBytes($"{_tempDirectoryName}/{fileId}/{fileName}");
+        }
+        catch (Exception e)
+        {
+            Log.Error(e, "Error while trying to read the file {File} bytes from local storage.", fileId);
+            throw new ApplicationException($"Error while trying to read the file {fileId} bytes from local storage.", e);
+        }
     }
 }

@@ -10,7 +10,7 @@ public class FileBackgroundService : IHostedService, IDisposable
     private readonly IRemoteFileStorageService _remoteFileStorageService;
     private readonly ILocalFileStorageService _localFileStorageService;
     private readonly IServiceScopeFactory _serviceScopeFactory;
-    private IFileRepository _fileRepository;
+    private IFileRepository _fileRepository = null!;
     private Timer? _timer;
     private bool _isProcessing;
 
@@ -123,7 +123,7 @@ public class FileBackgroundService : IHostedService, IDisposable
         Log.Information("Deleting file {FileId}.", fileId);
 
         await _remoteFileStorageService.DeleteFileAsync(fileName);
-        Log.Debug("file {FileId} was deleted from remote storage", fileId);
+        Log.Debug("file {FileId} was deleted from remote storage.", fileId);
 
         await _fileRepository.UpdateFileLogToSuccessByFileAndProcessTypeIdAsync(fileId, ProcessTypesEnum.Delete);
         await _fileRepository.UpdateFileByIdAsync(fileId, null, true);
@@ -137,7 +137,7 @@ public class FileBackgroundService : IHostedService, IDisposable
         var file = _localFileStorageService.GetFileById(fileId, fileName);
         var uploadedFileUri = await _remoteFileStorageService.UploadFileAsync(file, fileName, contentType);
 
-        Log.Debug("file {FileId} was uploaded to the remote storage. File Url {Url}", fileId, uploadedFileUri);
+        Log.Debug("file {FileId} was uploaded to the remote storage. File Url {Url}.", fileId, uploadedFileUri);
 
         _localFileStorageService.DeleteFile(fileId, fileName);
         Log.Debug("File {FileId} was deleted from the disk.", fileId);

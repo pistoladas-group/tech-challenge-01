@@ -1,7 +1,5 @@
 ﻿using System.Diagnostics;
-
 using Microsoft.AspNetCore.Mvc;
-
 using TechBox.Web.Models;
 
 namespace TechBox.Web.Controllers;

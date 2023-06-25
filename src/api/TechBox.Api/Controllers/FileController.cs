@@ -99,18 +99,18 @@ public class FilesController : ControllerBase
         
         var fileToAdd = new AddFileDto(formFile.FileName, formFile.Length, formFile.ContentType);
         
-        var addedFileId = await _fileRepository.AddFileAsync(fileToAdd);
+        var fileId = await _fileRepository.AddFileAsync(fileToAdd);
 
-        var existingFileLog = await _fileRepository.GetFileLogByFileIdAndProcessTypeIdAsync(addedFileId, ProcessTypesEnum.Upload);
+        var existingFileLog = await _fileRepository.GetFileLogByFileIdAndProcessTypeIdAsync(fileId, ProcessTypesEnum.Upload);
         
         if (existingFileLog is null)
         {
-            await _fileRepository.AddFileLogAsync(new AddFileLogDto(addedFileId, ProcessTypesEnum.Upload));
+            await _fileRepository.AddFileLogAsync(new AddFileLogDto(fileId, ProcessTypesEnum.Upload));
         }
 
-        _localFileStorageService.SaveFile(formFile, addedFileId);
+        _localFileStorageService.SaveFile(formFile, fileId);
 
-        return CreatedAtAction(nameof(GetFileById), new { fileId = addedFileId }, new ApiResponse());
+        return CreatedAtAction(nameof(GetFileById), new { fileId }, new ApiResponse());
     }
 
     /// <summary>

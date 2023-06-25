@@ -1,6 +1,7 @@
-CREATE OR ALTER PROCEDURE SP_UPD_FileLogToFailedByFileId
+CREATE OR ALTER PROCEDURE SP_UPD_FileLogToFailedByFileAndProcessTypeId
 (
     @FileId UNIQUEIDENTIFIER,
+    @ProcessTypeId TINYINT,
     @FinishedAt DATETIME,
     @ErrorMessage VARCHAR(1000)
 )
@@ -17,7 +18,8 @@ BEGIN
     INNER JOIN
         Files ON FileLogs.FileId = Files.Id
     WHERE
-        Files.Id = @FileId;
+        Files.Id = @FileId AND
+        FileLogs.ProcessTypeId = @ProcessTypeId;
 
     SELECT @@ROWCOUNT 'AffectedRows';
 END;

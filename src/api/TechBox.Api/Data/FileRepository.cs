@@ -22,7 +22,7 @@ public class FileRepository : IFileRepository
     {
         return await _storedProcedureHandler.ExecuteListAsync<Guid>("SP_LST_PendingFiles", new ListProcedureParameters(pageNumber, pageSize));
     }
-    
+
     public async Task<IEnumerable<ListFilePendingLogsResponseDto>> ListFilePendingLogsAsync(Guid fileId, int pageNumber, int pageSize)
     {
         return await _storedProcedureHandler.ExecuteListAsync<ListFilePendingLogsResponseDto>("SP_LST_FilePendingLogs", new ListFilePendingLogsProcedureParameters(fileId, pageNumber, pageSize));
@@ -40,7 +40,7 @@ public class FileRepository : IFileRepository
             return null;
         }
     }
-    
+
     public async Task<FileLogDto?> GetFileLogByFileIdAndProcessTypeIdAsync(Guid fileId, ProcessTypesEnum processTypesId)
     {
         try
@@ -113,11 +113,11 @@ public class FileRepository : IFileRepository
         return fileLogDto.Id;
     }
 
-    public async Task<int> UpdateFileLogToProcessingByFileIdAsync(Guid fileId)
+    public async Task<int> UpdateFileLogToProcessingByFileAndProcessTypeIdAsync(Guid fileId, ProcessTypesEnum processTypeId)
     {
-        var procedureName = "SP_UPD_FileLogToProcessingByFileId";
+        var procedureName = "SP_UPD_FileLogToProcessingByFileAndProcessTypeId";
 
-        var affectedRows = await _storedProcedureHandler.ExecuteUpdateAsync(procedureName, new UpdateFileLogToProcessingByFileIdAndProcessTypeDto(fileId));
+        var affectedRows = await _storedProcedureHandler.ExecuteUpdateAsync(procedureName, new UpdateFileLogToProcessingByFileAndProcessTypeDto(fileId, processTypeId));
 
         if (affectedRows <= 0)
         {
@@ -127,11 +127,11 @@ public class FileRepository : IFileRepository
         return affectedRows;
     }
 
-    public async Task<int> UpdateFileLogToSuccessByFileIdAndProcessTypeAsync(Guid fileId, ProcessTypesEnum processTypeId)
+    public async Task<int> UpdateFileLogToSuccessByFileAndProcessTypeIdAsync(Guid fileId, ProcessTypesEnum processTypeId)
     {
-        var procedureName = "SP_UPD_FileLogToSuccessByFileIdAndProcessTypeId";
+        var procedureName = "SP_UPD_FileLogToSuccessByFileAndProcessTypeId";
 
-        var affectedRows = await _storedProcedureHandler.ExecuteUpdateAsync(procedureName, new UpdateFileLogToSuccessByFileIdAndProcessTypeDto(fileId, processTypeId));
+        var affectedRows = await _storedProcedureHandler.ExecuteUpdateAsync(procedureName, new UpdateFileLogToSuccessByFileAndProcessTypeDto(fileId, processTypeId));
 
         if (affectedRows <= 0)
         {
@@ -141,11 +141,11 @@ public class FileRepository : IFileRepository
         return affectedRows;
     }
 
-    public async Task<int> UpdateFileLogToFailedByIdAsync(Guid fileId, string errorMessage)
+    public async Task<int> UpdateFileLogToFailedByFileAndProcessTypeId(Guid fileId, ProcessTypesEnum processTypeId, string errorMessage)
     {
-        var procedureName = "SP_UPD_FileLogToFailedByFileId";
+        var procedureName = "SP_UPD_FileLogToFailedByFileAndProcessTypeId";
 
-        var affectedRows = await _storedProcedureHandler.ExecuteUpdateAsync(procedureName, new UpdateFileLogToFailedByFileIdAndProcessTypeDto(fileId, errorMessage));
+        var affectedRows = await _storedProcedureHandler.ExecuteUpdateAsync(procedureName, new UpdateFileLogToFailedByFileAndProcessTypeIdDto(fileId, processTypeId, errorMessage));
 
         if (affectedRows <= 0)
         {
@@ -154,7 +154,7 @@ public class FileRepository : IFileRepository
 
         return affectedRows;
     }
-    
+
     public async Task<int> UpdateFileByIdAsync(Guid fileId, Uri? fileUrl, bool isDeleted)
     {
         var procedureName = "SP_UPD_FileById";

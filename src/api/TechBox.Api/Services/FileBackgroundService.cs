@@ -1,4 +1,5 @@
 using Serilog;
+
 using TechBox.Api.Data;
 using TechBox.Api.Models;
 
@@ -53,7 +54,7 @@ public class FileBackgroundService : IHostedService, IDisposable
             var pendingFileLogs = await _fileRepository.ListFilePendingLogsAsync(pendingFileId, 1, int.MaxValue);
             var convertedPendingLogs = pendingFileLogs.ToList();
 
-            await _fileRepository.UpdateFileLogToProcessingByFileIdAsync(pendingFileId);
+            await _fileRepository.UpdateFileLogToProcessingByFileAndProcessTypeIdAsync(pendingFileId, convertedPendingLogs.First().ProcessTypeId);
             Log.Debug("File {FileId} processing marked as {Processing}.", pendingFileId, "Processing");
 
             var hasPendingDelete = convertedPendingLogs.Any(x => x.ProcessTypeId == ProcessTypesEnum.Delete);
@@ -72,8 +73,8 @@ public class FileBackgroundService : IHostedService, IDisposable
                 _localFileStorageService.DeleteFile(pendingFileId, convertedPendingLogs.First().FileName);
                 Log.Debug("File {FileId} was deleted from the disk.", pendingFileId);
 
-                await _fileRepository.UpdateFileLogToSuccessByFileIdAndProcessTypeAsync(pendingFileId, ProcessTypesEnum.Upload);
-                await _fileRepository.UpdateFileLogToSuccessByFileIdAndProcessTypeAsync(pendingFileId, ProcessTypesEnum.Delete);
+                await _fileRepository.UpdateFileLogToSuccessByFileAndProcessTypeIdAsync(pendingFileId, ProcessTypesEnum.Upload);
+                await _fileRepository.UpdateFileLogToSuccessByFileAndProcessTypeIdAsync(pendingFileId, ProcessTypesEnum.Delete);
                 Log.Debug("File {FileId} processing marked as {Success}.", pendingFileId, "Success");
 
                 continue;
@@ -113,7 +114,7 @@ public class FileBackgroundService : IHostedService, IDisposable
     private async Task HandleExecutionError(Exception e, Guid pendingFileId, ProcessTypesEnum processTypesId)
     {
         Log.Error(e, "Error while processing {ProcessType} for the file {File}.", pendingFileId, processTypesId == ProcessTypesEnum.Upload ? "upload" : "delete");
-        await _fileRepository.UpdateFileLogToFailedByIdAsync(pendingFileId, e.Message);
+        await _fileRepository.UpdateFileLogToFailedByFileAndProcessTypeId(pendingFileId, processTypesId, e.Message);
         await _fileRepository.UpdateFileProcessStatusByIdAsync(pendingFileId, ProcessStatusEnum.Failed);
     }
 
@@ -124,7 +125,7 @@ public class FileBackgroundService : IHostedService, IDisposable
         await _remoteFileStorageService.DeleteFileAsync(fileName);
         Log.Debug("file {FileId} was deleted from remote storage", fileId);
 
-        await _fileRepository.UpdateFileLogToSuccessByFileIdAndProcessTypeAsync(fileId, ProcessTypesEnum.Delete);
+        await _fileRepository.UpdateFileLogToSuccessByFileAndProcessTypeIdAsync(fileId, ProcessTypesEnum.Delete);
         await _fileRepository.UpdateFileByIdAsync(fileId, null, true);
         Log.Debug("File {FileId} processing marked as {Success}.", fileId, "Success");
     }
@@ -141,7 +142,7 @@ public class FileBackgroundService : IHostedService, IDisposable
         _localFileStorageService.DeleteFile(fileId, fileName);
         Log.Debug("File {FileId} was deleted from the disk.", fileId);
 
-        await _fileRepository.UpdateFileLogToSuccessByFileIdAndProcessTypeAsync(fileId, ProcessTypesEnum.Upload);
+        await _fileRepository.UpdateFileLogToSuccessByFileAndProcessTypeIdAsync(fileId, ProcessTypesEnum.Upload);
         await _fileRepository.UpdateFileByIdAsync(fileId, uploadedFileUri, false);
         Log.Debug("File {FileId} processing marked as {Success}.", fileId, "Success");
     }

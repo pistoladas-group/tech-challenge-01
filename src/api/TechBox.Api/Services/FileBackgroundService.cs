@@ -6,12 +6,12 @@ namespace TechBox.Api.Services;
 
 public class FileBackgroundService : IHostedService, IDisposable
 {
-    private IRemoteFileStorageService _remoteFileStorageService;   
-    private ILocalFileStorageService _localFileStorageService;   
-    private IServiceScopeFactory _serviceScopeFactory;   
+    private readonly IRemoteFileStorageService _remoteFileStorageService;
+    private readonly ILocalFileStorageService _localFileStorageService;
+    private readonly IServiceScopeFactory _serviceScopeFactory;
+    private IFileRepository _fileRepository;
     private Timer? _timer;
     private bool _isProcessing;
-    private IFileRepository _fileRepository;
 
     public FileBackgroundService(IServiceScopeFactory serviceScopeFactory, IRemoteFileStorageService remoteFileStorageService, ILocalFileStorageService localFileStorageService)
     {
@@ -33,10 +33,10 @@ public class FileBackgroundService : IHostedService, IDisposable
             Log.Debug("Background service last execution still running. Aborting.");
             return;
         }
-        
+
         _isProcessing = true;
         Log.Information("Background service started.");
-        
+
         using var scope = _serviceScopeFactory.CreateScope();
         _fileRepository = scope.ServiceProvider.GetRequiredService<IFileRepository>();
 
@@ -49,10 +49,10 @@ public class FileBackgroundService : IHostedService, IDisposable
         {
             Guid pendingFileId = convertedFileIds[index];
             Log.Information("Working on file {FileId}. Number {Number} of {Total}.", pendingFileId, index + 1, convertedFileIds.Count);
-            
+
             var pendingFileLogs = await _fileRepository.ListFilePendingLogsAsync(pendingFileId, 1, int.MaxValue);
             var convertedPendingLogs = pendingFileLogs.ToList();
-            
+
             await _fileRepository.UpdateFileLogToProcessingByFileIdAsync(pendingFileId);
             Log.Debug("File {FileId} processing marked as {Processing}.", pendingFileId, "Processing");
 
@@ -64,7 +64,7 @@ public class FileBackgroundService : IHostedService, IDisposable
                 Log.Warning("No log found for the pending file {FileId}. Skipping it.", pendingFileId);
                 continue;
             }
-            
+
             if (hasPendingUpload && hasPendingDelete)
             {
                 Log.Information("File {FileId} has both upload and delete logs.", pendingFileId);
@@ -123,7 +123,7 @@ public class FileBackgroundService : IHostedService, IDisposable
 
         await _remoteFileStorageService.DeleteFileAsync(fileName);
         Log.Debug("file {FileId} was deleted from remote storage", fileId);
-        
+
         await _fileRepository.UpdateFileLogToSuccessByFileIdAndProcessTypeAsync(fileId, ProcessTypesEnum.Delete);
         await _fileRepository.UpdateFileByIdAsync(fileId, null, true);
         Log.Debug("File {FileId} processing marked as {Success}.", fileId, "Success");
@@ -137,10 +137,10 @@ public class FileBackgroundService : IHostedService, IDisposable
         var uploadedFileUri = await _remoteFileStorageService.UploadFileAsync(file, fileName, contentType);
 
         Log.Debug("file {FileId} was uploaded to the remote storage. File Url {Url}", fileId, uploadedFileUri);
-        
+
         _localFileStorageService.DeleteFile(fileId, fileName);
         Log.Debug("File {FileId} was deleted from the disk.", fileId);
-        
+
         await _fileRepository.UpdateFileLogToSuccessByFileIdAndProcessTypeAsync(fileId, ProcessTypesEnum.Upload);
         await _fileRepository.UpdateFileByIdAsync(fileId, uploadedFileUri, false);
         Log.Debug("File {FileId} processing marked as {Success}.", fileId, "Success");
@@ -151,7 +151,7 @@ public class FileBackgroundService : IHostedService, IDisposable
         Log.Information("Background service is stopping.");
 
         _timer?.Change(Timeout.Infinite, 0);
-        
+
         return Task.CompletedTask;
     }
 

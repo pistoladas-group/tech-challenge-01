@@ -1,22 +1,48 @@
-html {
-  font-size: 14px;
+.toolbar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    background-color: #2496d4;
+    color: white;
+    font-weight: 600;
 }
 
-@media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
+    .toolbar img {
+        margin: 0 16px;
+    }
+
+.spacer {
+    flex: 1;
 }
 
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+.content {
+    margin: 82px auto 32px;
+    padding: 0 16px;
 }
 
-html {
-  position: relative;
-  min-height: 100%;
+.download-icon {
+    padding-right: 15px;
+    color: #4abc96;
 }
 
-body {
-  margin-bottom: 60px;
+.edit-icon {
+    padding-right: 15px;
+    color: #1499db;
+}
+
+.delete-icon {
+    padding-right: 15px;
+    color: #f50018;
+}
+
+svg#clouds {
+    position: fixed;
+    bottom: -160px;
+    left: -230px;
+    z-index: -10;
+    width: 1920px;
 }

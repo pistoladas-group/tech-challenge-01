@@ -29,12 +29,14 @@ public class HomeController : Controller
         
         request.Content = content;
         
-        var response = await client.SendAsync(request);
+        var apiResponse = await client.SendAsync(request);
         
-        response.EnsureSuccessStatusCode();
+        apiResponse.EnsureSuccessStatusCode();
+
+        var reponse = System.Text.Json.JsonSerializer.Serialize(await apiResponse.Content.ReadAsStringAsync());
         
-        Console.WriteLine(await response.Content.ReadAsStringAsync());
-        return Ok();
+        Console.WriteLine(await apiResponse.Content.ReadAsStringAsync());
+        return Ok(reponse);
     }
     
     [HttpPost("{fileId:guid}/status")]

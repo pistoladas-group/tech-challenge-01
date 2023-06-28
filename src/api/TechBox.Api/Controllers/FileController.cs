@@ -110,7 +110,7 @@ public class FilesController : ControllerBase
 
         _localFileStorageService.SaveFile(formFile, fileId);
 
-        return CreatedAtAction(nameof(GetFileById), new { fileId }, new ApiResponse());
+        return CreatedAtAction(nameof(GetFileById), new { fileId }, new ApiResponse(data: new { fileId }));
     }
 
     /// <summary>

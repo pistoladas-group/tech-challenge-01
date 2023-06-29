@@ -1,12 +1,19 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 
 namespace TechBox.Web.Controllers;
 
 [Route("[controller]")]
 public class HomeController : Controller
 {
-    public HomeController()
+    // TODO: Tratar exceções em um filtro retornando
+    // um JSON para o front similiar ao ApiResponse
+    // para que o JS não receba a exceção "pura"
+
+    private readonly IHttpClientFactory _httpFactory;
+
+    public HomeController(IHttpClientFactory httpFactory)
     {
+        _httpFactory = httpFactory;
     }
 
     [HttpGet("")]
@@ -18,7 +25,7 @@ public class HomeController : Controller
     [HttpPost("upload")]
     public async Task<IActionResult> UploadFileAsync(IFormFile formFile)
     {
-        var client = new HttpClient();
+        var client = _httpFactory.CreateClient();
         var request = new HttpRequestMessage(HttpMethod.Post, $"https://localhost:5001/api/files"); //TODO: deixar a url dinâmica
         var content = new MultipartFormDataContent();
         var streamContent = new StreamContent(formFile.OpenReadStream());

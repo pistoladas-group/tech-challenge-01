@@ -52,21 +52,21 @@ public class FilesController : ControllerBase
     /// <response code="400">There is a problem with the request</response>
     /// <response code="404">The resource was not found</response>
     /// <response code="500">An internal error occurred</response>
-    [HttpGet("{fileId:guid}")]
+    [HttpGet("{id:guid}")]
     [Consumes("application/json")]
     [Produces("application/json")]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.OK)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.BadRequest)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-    public async Task<IActionResult> GetFileById([FromRoute] Guid fileId)
+    public async Task<IActionResult> GetFileById([FromRoute] Guid id)
     {
-        if (fileId == Guid.Empty)
+        if (id == Guid.Empty)
         {
             return BadRequest(new ApiResponse(error: "Invalid fileId"));
         }
 
-        var storedFile = await _fileRepository.GetFileByIdAsync(fileId);
+        var storedFile = await _fileRepository.GetFileByIdAsync(id);
 
         if (storedFile is null)
         {
@@ -99,18 +99,18 @@ public class FilesController : ControllerBase
         
         var fileToAdd = new AddFileDto(formFile.FileName, formFile.Length, formFile.ContentType);
         
-        var fileId = await _fileRepository.AddFileAsync(fileToAdd);
+        var id = await _fileRepository.AddFileAsync(fileToAdd);
 
-        var existingFileLog = await _fileRepository.GetFileLogByFileIdAndProcessTypeIdAsync(fileId, ProcessTypesEnum.Upload);
+        var existingFileLog = await _fileRepository.GetFileLogByFileIdAndProcessTypeIdAsync(id, ProcessTypesEnum.Upload);
         
         if (existingFileLog is null)
         {
-            await _fileRepository.AddFileLogAsync(new AddFileLogDto(fileId, ProcessTypesEnum.Upload));
+            await _fileRepository.AddFileLogAsync(new AddFileLogDto(id, ProcessTypesEnum.Upload));
         }
 
-        _localFileStorageService.SaveFile(formFile, fileId);
+        _localFileStorageService.SaveFile(formFile, id);
 
-        return CreatedAtAction(nameof(GetFileById), new { fileId }, new ApiResponse(data: new { fileId }));
+        return CreatedAtAction(nameof(GetFileById), new { id }, new ApiResponse(data: new { id }));
     }
 
     /// <summary>
@@ -119,28 +119,28 @@ public class FilesController : ControllerBase
     /// <response code="202">Operation accepted and being processed</response>
     /// <response code="404">The resource was not found</response>
     /// <response code="500">An internal error occurred</response>
-    [HttpDelete("{fileId:guid}")]
+    [HttpDelete("{id:guid}")]
     [Consumes("application/json")]
     [Produces("application/json")]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.Accepted)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.NotFound)]
     [ProducesResponseType(typeof(ApiResponse), (int)HttpStatusCode.InternalServerError)]
-    public async Task<IActionResult> DeleteFile([FromRoute] Guid fileId)
+    public async Task<IActionResult> DeleteFile([FromRoute] Guid id)
     {
-        var file = await _fileRepository.GetFileByIdAsync(fileId);
+        var file = await _fileRepository.GetFileByIdAsync(id);
 
         if (file is null)
         {
             return NotFound(new ApiResponse(error: "no file found"));
         }
 
-        await _fileRepository.UpdateFileProcessStatusByIdAsync(fileId, ProcessStatusEnum.Pending);
+        await _fileRepository.UpdateFileProcessStatusByIdAsync(id, ProcessStatusEnum.Pending);
 
-        var existingFileLog = await _fileRepository.GetFileLogByFileIdAndProcessTypeIdAsync(fileId, ProcessTypesEnum.Delete);
+        var existingFileLog = await _fileRepository.GetFileLogByFileIdAndProcessTypeIdAsync(id, ProcessTypesEnum.Delete);
         
         if (existingFileLog is null)
         {
-            await _fileRepository.AddFileLogAsync(new AddFileLogDto(fileId, ProcessTypesEnum.Delete));
+            await _fileRepository.AddFileLogAsync(new AddFileLogDto(id, ProcessTypesEnum.Delete));
         }
         
         return Accepted(new ApiResponse());

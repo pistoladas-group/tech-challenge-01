@@ -19,7 +19,7 @@ BEGIN
     WHERE
         Files.IsDeleted = 0
     ORDER BY
-        Files.Id
+        Files.CreatedAt
     OFFSET
         (@PageNumber - 1) * @PageSize ROWS
     FETCH NEXT

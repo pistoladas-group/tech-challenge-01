@@ -6,7 +6,8 @@ CREATE OR ALTER PROCEDURE SP_LST_PendingFiles
 AS
 BEGIN
     SELECT DISTINCT
-        Files.Id
+        Files.Id,
+        Files.CreatedAt
     FROM
         FileLogs
     INNER JOIN
@@ -16,7 +17,7 @@ BEGIN
         FileLogs.IsDeleted = 0 and
         Files.IsDeleted = 0
     ORDER BY
-        Files.Id
+        Files.CreatedAt
     OFFSET
         (@PageNumber - 1) * @PageSize ROWS
     FETCH NEXT

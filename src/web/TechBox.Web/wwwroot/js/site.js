@@ -81,7 +81,7 @@ const manageFileUpload = (file) => {
                 // TODO: Tratar erro > Talvez um toaster?
             }
 
-            addRow(response.data);
+            setRowData(response.data);
         }
     }
 

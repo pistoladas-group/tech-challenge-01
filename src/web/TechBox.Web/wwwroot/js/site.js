@@ -5,9 +5,16 @@ const buttonUploadElement = document.getElementById('btnUpload');
 const tableElement = document.getElementById('tblFiles');
 const tbodyElement = tableElement.getElementsByTagName("tbody")[0];
 const rowCloneElement = document.getElementById(rowCloneId);
+const canvasLabelElement = document.getElementById('image-offcanvas-label');
+const canvasImageElement = document.getElementById('imgCanvasFile');
+const offcanvasElementList = [].slice.call(document.querySelectorAll('.offcanvas'));
+const offcanvasList = offcanvasElementList.map(function (offcanvasEl) {
+    return new bootstrap.Offcanvas(offcanvasEl);
+});
 
 const configureElements = () => {
     disableUploadButton();
+    setImageNotFoundElement();
 };
 
 const configureEvents = () => {
@@ -142,12 +149,23 @@ const addRow = (data) => {
 
     updateRow(clonedRow, data);
 
+    clonedRow.addEventListener("click", (e) => {
+        setImageNotFoundElement();
+
+        if (e.currentTarget.dataset.fileUrl != "null") {
+            setImageElement(e.currentTarget.dataset.fileName, e.currentTarget.dataset.fileUrl);
+            offcanvasList[0].show();
+        }
+    });
+
     tbodyElement.insertRow(0).insertAdjacentElement('beforebegin', clonedRow);
     clonedRow.classList.remove('d-none');
 };
 
 const updateRow = (row, data) => {
     row.setAttribute("data-file-id", data.id);
+    row.setAttribute("data-file-name", data.name);
+    row.setAttribute("data-file-url", data.url);
 
     let nameElement = row.querySelector('[data-file-name]');
     let sizeElement = row.querySelector('[data-file-size]');
@@ -194,6 +212,16 @@ const hideActionsProcessingElements = (row) => {
 const showActionsProcessingElements = (row) => {
     let actionsProcessingElement = row.querySelector('[data-file-actions-processing]');
     actionsProcessingElement.classList.remove("d-none");
+};
+
+const setImageNotFoundElement = () => {
+    canvasLabelElement.textContent = "Imagem não encontrada";
+    canvasImageElement.src = "/image-not-found.png";
+};
+
+const setImageElement = (fileName, url) => {
+    canvasLabelElement.textContent = fileName;
+    canvasImageElement.src = url;
 };
 
 const formatSize = (sizeInBytes) => {

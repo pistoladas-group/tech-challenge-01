@@ -1,3 +1,5 @@
+﻿using System.Text.Json;
+
 using Microsoft.AspNetCore.Mvc;
 
 namespace TechBox.Web.Controllers;
@@ -21,7 +23,7 @@ public class HomeController : Controller
     {
         return View();
     }
-    
+
     [HttpPost("upload")]
     public async Task<IActionResult> UploadFileAsync(IFormFile formFile)
     {
@@ -31,21 +33,43 @@ public class HomeController : Controller
         var streamContent = new StreamContent(formFile.OpenReadStream());
 
         streamContent.Headers.Add("Content-Type", formFile.ContentType);
-        
+
         content.Add(streamContent, "formFile", formFile.FileName);
-        
+
         request.Content = content;
-        
+
         var apiResponse = await client.SendAsync(request);
-        
+
         apiResponse.EnsureSuccessStatusCode();
 
-        var reponse = System.Text.Json.JsonSerializer.Serialize(await apiResponse.Content.ReadAsStringAsync());
-        
-        Console.WriteLine(await apiResponse.Content.ReadAsStringAsync());
+        apiResponse.Headers.TryGetValues("location", out var locationValues);
+
+        request = new HttpRequestMessage(HttpMethod.Get, locationValues?.FirstOrDefault());
+
+        apiResponse = await client.SendAsync(request);
+
+        apiResponse.EnsureSuccessStatusCode();
+
+        var reponse = JsonSerializer.Serialize(await apiResponse.Content.ReadAsStringAsync());
+
         return Ok(reponse);
     }
-    
+
+    [HttpGet("files")]
+    public async Task<IActionResult> ListFilesAsync()
+    {
+        var client = _httpFactory.CreateClient();
+        var request = new HttpRequestMessage(HttpMethod.Get, $"https://localhost:5001/api/files?pageNumber=1&pageSize=100"); //TODO: deixar a url dinâmica
+
+        var apiResponse = await client.SendAsync(request);
+
+        apiResponse.EnsureSuccessStatusCode();
+
+        var reponse = JsonSerializer.Serialize(await apiResponse.Content.ReadAsStringAsync());
+
+        return Ok(reponse);
+    }
+
     [HttpPost("{fileId:guid}/status")]
     public IActionResult GetFileStatus([FromRoute] Guid fileId)
     {

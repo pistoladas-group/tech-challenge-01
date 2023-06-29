@@ -11,9 +11,9 @@
     font-weight: 600;
 }
 
-    .toolbar img {
-        margin: 0 16px;
-    }
+.toolbar img {
+    margin: 0 16px;
+}
 
 .spacer {
     flex: 1;
@@ -39,10 +39,20 @@
     color: #f50018;
 }
 
+.processing-icon {
+    padding-right: 15px;
+    color: #4878cb;
+}
+
 svg#clouds {
     position: fixed;
     bottom: -160px;
     left: -230px;
     z-index: -10;
     width: 1920px;
+}
+
+td {
+    width: 100px;
+    height: 24px;
 }

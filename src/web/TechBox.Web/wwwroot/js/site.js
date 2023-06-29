@@ -1,13 +1,18 @@
 ﻿const fileInputElement = document.getElementById('formFileMultiple');
+const buttonUpload = document.getElementById('btnUpload');
 
 const configureEvents = () => {
-    fileInputElement.onchange = function (event) {
-        let files = Array.from(event.target.files);
+    // TODO: Habilitar upload somente quando tiver arquivo no input file
+    // quando não tiver, deixar desabilitado
+
+    buttonUpload.addEventListener("click", () => {
+        let files = Array.from(fileInputElement.files);
+
         if (!files || files.length <= 0) {
             return;
         }
         files.forEach(file => manageFileUpload(file));
-    };
+    });
 };
 
 const manageFileUpload = (file) => {

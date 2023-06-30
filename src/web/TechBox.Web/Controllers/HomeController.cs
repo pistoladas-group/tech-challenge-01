@@ -70,9 +70,17 @@ public class HomeController : Controller
         return Ok(reponse);
     }
 
-    [HttpPost("{fileId:guid}/status")]
-    public IActionResult GetFileStatus([FromRoute] Guid fileId)
+    [HttpDelete("{id:guid}")]
+    public async Task<IActionResult> GetFileStatus([FromRoute] Guid id)
     {
+        var client = _httpFactory.CreateClient();
+        var request = new HttpRequestMessage(HttpMethod.Delete, $"https://localhost:5001/api/files/{id}"); //TODO: deixar a url dinâmica
+        var apiResponse = await client.SendAsync(request);
+
+        apiResponse.EnsureSuccessStatusCode();
+        
+        //TODO: seguir daqui
+        
         return Ok();
     }
 }

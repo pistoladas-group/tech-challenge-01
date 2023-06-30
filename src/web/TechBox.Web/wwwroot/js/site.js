@@ -7,10 +7,15 @@ const tbodyElement = tableElement.getElementsByTagName("tbody")[0];
 const rowCloneElement = document.getElementById(rowCloneId);
 const canvasLabelElement = document.getElementById('image-offcanvas-label');
 const canvasImageElement = document.getElementById('imgCanvasFile');
-const offcanvasElementList = [].slice.call(document.querySelectorAll('.offcanvas'));
-const offcanvasList = offcanvasElementList.map(function (offcanvasEl) {
-    return new bootstrap.Offcanvas(offcanvasEl);
-});
+const offCanvasElementList = [].slice.call(document.querySelectorAll('.offcanvas'));
+const offCanvasList = offCanvasElementList.map((offcanvasEl) =>  new bootstrap.Offcanvas(offcanvasEl));
+
+const processStatus = {
+    pending: 1,
+    processing: 2, 
+    failed: 3,
+    success: 4
+};
 
 const configureElements = () => {
     disableUploadButton();
@@ -18,7 +23,7 @@ const configureElements = () => {
 };
 
 const configureEvents = () => {
-    fileInputElement.onchange = function (event) {
+    fileInputElement.onchange = (event) => {
         let files = Array.from(event.target.files);
         if (files && files.length > 0) {
             enableUploadButton();
@@ -44,7 +49,6 @@ const configureEvents = () => {
 
 const startPolling = () => {
     listFiles();
-
     setInterval(listFiles, 2000); // 2 secs
 };
 
@@ -56,7 +60,7 @@ const manageFileUpload = (file) => {
         console.log(e);
     });
 
-    xhr.onreadystatechange = function () {
+    xhr.onreadystatechange = () => {
         if (xhr.readyState !== 4) {
             return;
         }
@@ -74,8 +78,8 @@ const manageFileUpload = (file) => {
         }
 
         if (xhr.readyState === 4 && xhr.status === 200) {
-            var responseText = JSON.parse(xhr.responseText);
-            var response = JSON.parse(responseText);
+            let responseText = JSON.parse(xhr.responseText);
+            let response = JSON.parse(responseText);
 
             if (!response.succeeded && response.data != null) {
                 // TODO: Tratar erro > Talvez um toaster?
@@ -96,20 +100,20 @@ const manageFileUpload = (file) => {
 const listFiles = () => {
     let xhr = new XMLHttpRequest();
 
-    xhr.onreadystatechange = function () {
+    xhr.onreadystatechange = () => {
         if (xhr.readyState !== 4) {
             return;
         }
 
         if (xhr.readyState === 4 && xhr.status === 500) {
-            var response = JSON.parse(xhr.responseText);
+            const response = JSON.parse(xhr.responseText);
             // TODO: Handle error. Maybe a toaster?
             console.log(response);
         }
 
         if (xhr.readyState === 4 && xhr.status === 200) {
-            var responseText = JSON.parse(xhr.responseText);
-            var response = JSON.parse(responseText);
+            const responseText = JSON.parse(xhr.responseText);
+            const response = JSON.parse(responseText);
 
             if (!response.succeeded && response.data != null) {
                 // TODO: Handle error. Maybe a toaster?
@@ -149,12 +153,17 @@ const addRow = (data) => {
 
     updateRow(clonedRow, data);
 
-    clonedRow.addEventListener("click", (e) => {
-        setImageNotFoundElement();
+    let nameElement = clonedRow.querySelector('[data-file-name]');
 
-        if (e.currentTarget.dataset.fileUrl != "null") {
-            setImageElement(e.currentTarget.dataset.fileName, e.currentTarget.dataset.fileUrl);
-            offcanvasList[0].show();
+    nameElement.addEventListener("click", (e) => {
+        setImageNotFoundElement();
+        
+        const fileUrl = e.target.parentElement.dataset.fileUrl;
+        const fileName = e.target.parentElement.dataset.fileName;
+        
+        if (fileUrl !== "null") {
+            setImageElement(fileName, fileUrl);
+            offCanvasList[0].show();
         }
     });
 
@@ -175,14 +184,15 @@ const updateRow = (row, data) => {
     sizeElement.textContent = formatSize(data.sizeInBytes);
     createdAtElement.textContent = formatToLocalDate(data.createdAt);
 
-    if (data.processStatusId === 1 || data.processStatusId === 2) {
+    if (data.processStatusId === processStatus.pending || data.processStatusId === processStatus.processing) {
         hideActionsCrudElements(row);
         showActionsProcessingElements(row);
     }
 
-    if (data.processStatusId === 4) {
+    if (data.processStatusId === processStatus.success) {
         hideActionsProcessingElements(row);
         showActionsCrudElements(row);
+        enableFileDownloadAndDelete(row, data.url, data.name);
     }
 };
 
@@ -212,6 +222,32 @@ const hideActionsProcessingElements = (row) => {
 const showActionsProcessingElements = (row) => {
     let actionsProcessingElement = row.querySelector('[data-file-actions-processing]');
     actionsProcessingElement.classList.remove("d-none");
+};
+
+const enableFileDownloadAndDelete = (row, fileUrl, fileName) => {
+    let downloadElement = row.querySelector('[data-file-download]');
+    let deleteElement = row.querySelector('[data-file-delete]');
+    
+    downloadElement.setAttribute('onclick', `downloadFile('${fileUrl}', '${fileName}')`);
+};
+
+const downloadFile = async (fileUrl, fileName) => {
+    //TODO: resolver problema de CORS
+    const a = document.createElement("a");
+    a.href = await toDataURL(fileUrl);
+    a.download = fileName;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+};
+
+const toDataURL = async (url) => {
+    const blob = await fetch(url).then(res => res.blob());
+    return URL.createObjectURL(blob);
+};
+
+const deleteFile = () => {
+
 };
 
 const setImageNotFoundElement = () => {

@@ -15,7 +15,7 @@
         </div>
 
         <div class="input-group mb-3 btn-group">
-            <input class="form-control" type="file" id="formFileMultiple" multiple>
+            <input class="form-control" type="file" id="formFileMultiple" multiple accept="image/*">
             <div class="btn-group" role="group">
                 <button id="btnUpload" type="button" class="btn btn-outline-success">Upload</button>
             </div>
@@ -38,8 +38,8 @@
                     <td data-file-created-at>-</td>
                     <td data-file-actions>
                         <div data-file-actions-crud class="d-none">
-                            <span class="fa-solid fa-cloud-arrow-down download-icon"></span>
-                            <span class="fa-regular fa-trash-can delete-icon"></span>
+                            <span data-file-download class="fa-solid fa-cloud-arrow-down download-icon"></span>
+                            <span data-file-delete class="fa-regular fa-trash-can delete-icon"></span>
                         </div>
                         <div data-file-actions-processing class="">
                             <span class="fa-solid fa-cloud-arrow-up fa-fade processing-icon"></span>
@@ -58,7 +58,7 @@
 
 </div>
 
-<div id="image-offcanvas" class="offcanvas offcanvas-end" tabindex="-1" aria-labelledby="image-offcanvas-label" style="width: 750px;">
+<div id="image-offcanvas" class="offcanvas offcanvas-end" tabindex="-1" aria-labelledby="image-offcanvas-label" style="width: 70%;">
     <div class="offcanvas-header">
         <h5 id="image-offcanvas-label" class="offcanvas-title">-</h5>
         <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>

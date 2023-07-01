@@ -36,7 +36,20 @@ public class HomeController : Controller
 
         var apiResponse = await client.SendAsync(request);
 
-        apiResponse.EnsureSuccessStatusCode();
+        if (!apiResponse.IsSuccessStatusCode && apiResponse.StatusCode == System.Net.HttpStatusCode.InternalServerError)
+        {
+            var errorResponse = JsonSerializer.Serialize(await apiResponse.Content.ReadAsStringAsync());
+            return new ObjectResult(errorResponse)
+            {
+                StatusCode = 500
+            };
+        }
+
+        if (!apiResponse.IsSuccessStatusCode && apiResponse.StatusCode == System.Net.HttpStatusCode.BadRequest)
+        {
+            var badResponse = JsonSerializer.Serialize(await apiResponse.Content.ReadAsStringAsync());
+            return BadRequest(badResponse);
+        }
 
         apiResponse.Headers.TryGetValues("location", out var locationValues);
 

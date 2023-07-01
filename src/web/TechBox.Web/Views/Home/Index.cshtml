@@ -21,6 +21,15 @@
             </div>
         </div>
 
+        <div id="warningAlert" class="alert alert-warning d-flex align-items-center d-none" role="alert">
+            <div>
+                <ul id="listWarning">
+                    @* li to be used as a template to clone *@
+                    <li id="warning-item-to-clone" class="d-none">-</li>
+                </ul>
+            </div>
+        </div>
+
         <table id="tblFiles" class="table">
             <thead>
                 <tr>
@@ -58,9 +67,9 @@
 
 </div>
 
-<div id="image-offcanvas" class="offcanvas offcanvas-end" tabindex="-1" aria-labelledby="image-offcanvas-label" style="width: 70%;">
+<div id="image-offcanvas" class="offcanvas offcanvas-end" tabindex="-1" aria-labelledby="lblOffcanvas" style="width: 70%;">
     <div class="offcanvas-header">
-        <h5 id="image-offcanvas-label" class="offcanvas-title">-</h5>
+        <h5 id="lblOffcanvas" class="offcanvas-title">-</h5>
         <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
     </div>
     <div class="offcanvas-body">
@@ -80,41 +89,5 @@
                 aria-label="Close"></button>
         </div>
         <div id="divErrorAlertMessage" class="toast-body">Tente novamente ou contate o suporte</div>
-    </div>
-</div>
-
-<div class="toast-container position-fixed top-0 end-0 p-3">
-    <div id="divWarningAlert" class="toast hide fade toast-warning" role="alert" aria-live="assertive"
-        aria-atomic="true" data-bs-autohide="false">
-        <div class="toast-header toast-warning">
-            <i class="fas fa-exclamation-triangle fa-lg me-2"></i>
-            <strong class="me-auto">Atenção!</strong>
-            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
-        </div>
-        <div id="divWarningAlertMessage" class="toast-body">...</div>
-    </div>
-</div>
-
-<div class="toast-container position-fixed top-0 end-0 p-3">
-    <div id="divInfoAlert" class="toast hide fade toast-info" role="alert" aria-live="assertive" aria-atomic="true"
-        data-bs-autohide="false">
-        <div class="toast-header toast-info">
-            <i class="fas fa-info-circle fa-lg me-2"></i>
-            <strong class="me-auto">TechBox</strong>
-            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
-        </div>
-        <div id="divInfoAlertMessage" class="toast-body">...</div>
-    </div>
-</div>
-
-<div class="toast-container position-fixed top-0 end-0 p-3">
-    <div id="divSuccessAlert" class="toast hide fade toast-success" role="alert" aria-live="assertive"
-        aria-atomic="true" data-bs-autohide="false">
-        <div class="toast-header toast-success">
-            <i class="fas fa-check fa-lg me-2"></i>
-            <strong class="me-auto">TechBox</strong>
-            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
-        </div>
-        <div id="divSuccessAlertMessage" class="toast-body">...</div>
     </div>
 </div>

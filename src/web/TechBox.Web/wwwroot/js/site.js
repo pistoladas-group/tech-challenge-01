@@ -1,16 +1,19 @@
 ﻿var pollingId = null;
-const rowCloneId = 'data-file-row-to-clone';
+
+const rowCloneElement = document.getElementById('data-file-row-to-clone');
+const warningItemCloneElement = document.getElementById('warning-item-to-clone');
 
 const fileInputElement = document.getElementById('formFileMultiple');
 const buttonUploadElement = document.getElementById('btnUpload');
 const tableElement = document.getElementById('tblFiles');
 const tbodyElement = tableElement.getElementsByTagName("tbody")[0];
-const rowCloneElement = document.getElementById(rowCloneId);
-const canvasLabelElement = document.getElementById('image-offcanvas-label');
+const canvasLabelElement = document.getElementById('lblOffcanvas');
 const canvasImageElement = document.getElementById('imgCanvasFile');
 const offCanvasElementList = [].slice.call(document.querySelectorAll('.offcanvas'));
 const offCanvasList = offCanvasElementList.map((offcanvasEl) => new bootstrap.Offcanvas(offcanvasEl));
 const errorAlertElement = bootstrap.Toast.getOrCreateInstance(document.getElementById('divErrorAlert'));
+const warningAlertElement = document.getElementById('warningAlert');
+const listWarningElement = document.getElementById('listWarning');
 
 const processStatus = {
     pending: 1,
@@ -44,6 +47,7 @@ const configureEvents = () => {
 
         fileInputElement.value = "";
         disableUploadButton();
+        clearWarningAlert();
 
         files.forEach(file => manageFileUpload(file));
     });
@@ -76,8 +80,10 @@ const manageFileUpload = (file) => {
         }
 
         if (xhr.readyState === 4 && xhr.status === 400) {
-            // TODO: Tratar erro > handleUploadError('Tamanho máximo de arquivo excedido ou extensão do arquivo inválido. Favor tentar novamente.');
-            showErrorAlert();
+            let responseText = JSON.parse(xhr.responseText);
+            let response = JSON.parse(responseText);
+
+            showWarningErrors(file.name, response.errors);
             return;
         }
 
@@ -138,6 +144,12 @@ const listFiles = () => {
 const clearTable = () => {
     while (tbodyElement.firstChild) {
         tbodyElement.removeChild(tbodyElement.firstChild);
+    }
+};
+
+const clearWarningAlert = () => {
+    while (listWarningElement.firstChild) {
+        listWarningElement.removeChild(listWarningElement.firstChild);
     }
 };
 
@@ -265,6 +277,24 @@ const showErrorAlert = (message) => {
     }
 
     errorAlertElement.show();
+};
+
+const showWarningErrors = (fileName, errors) => {
+    warningAlertElement.classList.add('d-none');
+
+    let clonedItem = warningItemCloneElement.cloneNode(true);
+    let joinedErrors = '';
+
+    errors.forEach((error) => {
+
+        joinedErrors = joinedErrors + ', ' + error;
+        listWarningElement.appendChild(clonedItem);
+        clonedItem.classList.remove('d-none');
+    });
+
+    clonedItem.innerHTML = '<b>' + fileName + '</b>: ' + joinedErrors.substring(2);
+
+    warningAlertElement.classList.remove('d-none');
 };
 
 const setImageNotFoundElement = () => {

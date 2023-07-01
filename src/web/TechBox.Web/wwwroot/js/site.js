@@ -1,4 +1,5 @@
-﻿const rowCloneId = 'data-file-row-to-clone';
+﻿var pollingId = null;
+const rowCloneId = 'data-file-row-to-clone';
 
 const fileInputElement = document.getElementById('formFileMultiple');
 const buttonUploadElement = document.getElementById('btnUpload');
@@ -8,11 +9,12 @@ const rowCloneElement = document.getElementById(rowCloneId);
 const canvasLabelElement = document.getElementById('image-offcanvas-label');
 const canvasImageElement = document.getElementById('imgCanvasFile');
 const offCanvasElementList = [].slice.call(document.querySelectorAll('.offcanvas'));
-const offCanvasList = offCanvasElementList.map((offcanvasEl) =>  new bootstrap.Offcanvas(offcanvasEl));
+const offCanvasList = offCanvasElementList.map((offcanvasEl) => new bootstrap.Offcanvas(offcanvasEl));
+const errorAlertElement = bootstrap.Toast.getOrCreateInstance(document.getElementById('divErrorAlert'));
 
 const processStatus = {
     pending: 1,
-    processing: 2, 
+    processing: 2,
     failed: 3,
     success: 4
 };
@@ -49,15 +51,18 @@ const configureEvents = () => {
 
 const startPolling = () => {
     listFiles();
-    setInterval(listFiles, 2000); // 2 secs
+    pollingId = setInterval(listFiles, 2000); // 2 secs
+};
+
+const stopPolling = (pollingId) => {
+    clearInterval(pollingId);
 };
 
 const manageFileUpload = (file) => {
     let xhr = new XMLHttpRequest();
 
     xhr.addEventListener('error', (e) => {
-        // TODO: Tratar erro > handleUploadError('Ocorreu um erro ao realizar a operação. Favor tentar novamente.');
-        console.log(e);
+        showErrorAlert();
     });
 
     xhr.onreadystatechange = () => {
@@ -66,14 +71,13 @@ const manageFileUpload = (file) => {
         }
 
         if (xhr.readyState === 4 && xhr.status === 500) {
-            // TODO: Tratar erro > handleUploadError('Ocorreu um erro ao realizar a operação. Favor tentar novamente.');
-            console.log(500);
+            showErrorAlert();
             return;
         }
 
         if (xhr.readyState === 4 && xhr.status === 400) {
             // TODO: Tratar erro > handleUploadError('Tamanho máximo de arquivo excedido ou extensão do arquivo inválido. Favor tentar novamente.');
-            console.log(400);
+            showErrorAlert();
             return;
         }
 
@@ -81,8 +85,8 @@ const manageFileUpload = (file) => {
             let responseText = JSON.parse(xhr.responseText);
             let response = JSON.parse(responseText);
 
-            if (!response.succeeded && response.data != null) {
-                // TODO: Tratar erro > Talvez um toaster?
+            if (!response.succeeded && response.errors !== null) {
+                showErrorAlert();
             }
 
             setRowData(response.data);
@@ -106,17 +110,17 @@ const listFiles = () => {
         }
 
         if (xhr.readyState === 4 && xhr.status === 500) {
-            const response = JSON.parse(xhr.responseText);
-            // TODO: Handle error. Maybe a toaster?
-            console.log(response);
+            showErrorAlert();
+            stopPolling(pollingId);
         }
 
         if (xhr.readyState === 4 && xhr.status === 200) {
             const responseText = JSON.parse(xhr.responseText);
             const response = JSON.parse(responseText);
 
-            if (!response.succeeded && response.data != null) {
-                // TODO: Handle error. Maybe a toaster?
+            if (!response.succeeded && response.errors !== null) {
+                showErrorAlert();
+                stopPolling(pollingId);
             }
 
             clearTable();
@@ -157,10 +161,10 @@ const addRow = (data) => {
 
     nameElement.addEventListener("click", (e) => {
         setImageNotFoundElement();
-        
+
         const fileUrl = e.target.parentElement.dataset.fileUrl;
         const fileName = e.target.parentElement.dataset.fileName;
-        
+
         if (fileUrl !== "null") {
             setImageElement(fileName, fileUrl);
             offCanvasList[0].show();
@@ -227,12 +231,11 @@ const showActionsProcessingElements = (row) => {
 const enableFileDownloadAndDelete = (row, fileUrl, fileName) => {
     let downloadElement = row.querySelector('[data-file-download]');
     let deleteElement = row.querySelector('[data-file-delete]');
-    
+
     downloadElement.setAttribute('onclick', `downloadFile('${fileUrl}', '${fileName}')`);
 };
 
 const downloadFile = async (fileUrl, fileName) => {
-    //TODO: resolver problema de CORS
     const a = document.createElement("a");
     a.href = await toDataURL(fileUrl);
     a.download = fileName;
@@ -248,6 +251,20 @@ const toDataURL = async (url) => {
 
 const deleteFile = () => {
 
+};
+
+const showErrorAlert = (message) => {
+    const errorAlertMessageElement = document.getElementById('divErrorAlertMessage');
+
+    let defaultMessage = 'Tente novamente ou contate o suporte';
+
+    errorAlertMessageElement.innerHTML = defaultMessage;
+
+    if (typeof message === "string" && message !== "") {
+        errorAlertMessageElement.textContent = message;
+    }
+
+    errorAlertElement.show();
 };
 
 const setImageNotFoundElement = () => {

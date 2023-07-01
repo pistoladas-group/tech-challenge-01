@@ -7,10 +7,6 @@ namespace TechBox.Web.Controllers;
 [Route("[controller]")]
 public class HomeController : Controller
 {
-    // TODO: Tratar exceções em um filtro retornando
-    // um JSON para o front similiar ao ApiResponse
-    // para que o JS não receba a exceção "pura"
-
     private readonly IHttpClientFactory _httpFactory;
 
     public HomeController(IHttpClientFactory httpFactory)

@@ -12,8 +12,11 @@
   </a>
 </p>
 
-
-# ![techbox](.github\images\website-demo.png)
+<p align="center">
+  <a href="">
+    <img src=".github\images\website-demo.png" alt="website-demo">
+  </a>
+</p>
 
 
 ## Table of Contents
@@ -47,11 +50,21 @@ It consists of a Frontend Web Application communicating with a Backend API that 
 
 ### Architecture
 This is an overview of the architecture of TechBox.
-# ![overview-architecture](.github\images\overview-architecture.png)
+
+<p align="center">
+  <a href="">
+    <img src=".github\images\overview-architecture.png" alt="overview-architecture">
+  </a>
+</p>
 
 ### Web App
 The design of the frontend application was based on a MVC (Model View Controller) architecture, using ASP.NET Core as framework, running as a client/server, and all business logic running server-side. The application is deployed in a [Web App Azure Resource](https://azure.microsoft.com/en-us/products/app-service/web). <br>
-# ![webapp-architecture](.github\images\webapp-architecture.png)
+
+<p align="center">
+  <a href="">
+    <img src=".github\images\webapp-architecture.png" alt="webapp-architecture">
+  </a>
+</p>
 
 ### Web API
 

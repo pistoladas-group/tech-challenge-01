@@ -14,7 +14,7 @@ public sealed class SqlServerStoredProcedureHandler : IStoredProcedureHandler
         _session = session;
     }
 
-    public async Task<IEnumerable<T1>> ExecuteListAsync<T1>(string procedureName, ListProcedureParameters procedureParameter, int? commandTimeout = null)
+    public async Task<IEnumerable<T1>> ExecuteListAsync<T1>(string procedureName, object procedureParameter, int? commandTimeout = null)
     {
         if (!procedureName.StartsWith("SP_LST_"))
         {
@@ -30,7 +30,7 @@ public sealed class SqlServerStoredProcedureHandler : IStoredProcedureHandler
         return procedureResult;
     }
 
-    public async Task<T1> ExecuteGetAsync<T1>(string procedureName, GetProcedureParameters procedureParameter, int? commandTimeout = null)
+    public async Task<T1> ExecuteGetAsync<T1>(string procedureName, object procedureParameter, int? commandTimeout = null)
     {
         if (!procedureName.StartsWith("SP_GET_"))
         {
@@ -46,7 +46,7 @@ public sealed class SqlServerStoredProcedureHandler : IStoredProcedureHandler
         return procedureResult;
     }
 
-    public async Task<int> ExecuteAddAsync(string procedureName, AddProcedureParameters procedureParameter, int? commandTimeout = null)
+    public async Task<int> ExecuteAddAsync(string procedureName, object procedureParameter, int? commandTimeout = null)
     {
         if (!procedureName.StartsWith("SP_ADD_"))
         {
@@ -62,7 +62,7 @@ public sealed class SqlServerStoredProcedureHandler : IStoredProcedureHandler
         return procedureResult;
     }
 
-    public async Task<int> ExecuteUpdateAsync(string procedureName, UpdateProcedureParameters procedureParameter, int? commandTimeout = null)
+    public async Task<int> ExecuteUpdateAsync(string procedureName, object procedureParameter, int? commandTimeout = null)
     {
         if (!procedureName.StartsWith("SP_UPD_"))
         {
@@ -78,7 +78,7 @@ public sealed class SqlServerStoredProcedureHandler : IStoredProcedureHandler
         return procedureResult;
     }
 
-    public async Task<int> ExecuteDeleteAsync(string procedureName, DeleteProcedureParameters procedureParameter, int? commandTimeout = null)
+    public async Task<int> ExecuteDeleteAsync(string procedureName, object procedureParameter, int? commandTimeout = null)
     {
         if (!procedureName.StartsWith("SP_DEL_"))
         {
@@ -86,6 +86,22 @@ public sealed class SqlServerStoredProcedureHandler : IStoredProcedureHandler
         }
 
         var procedureResult = await _session.Connection.ExecuteAsync(
+            procedureName,
+            param: procedureParameter,
+            commandType: CommandType.StoredProcedure,
+            commandTimeout: commandTimeout ?? CommandTimeoutInSeconds);
+
+        return procedureResult;
+    }
+    
+    public async Task<bool> ExecuteCheckAsync(string procedureName, object procedureParameter, int? commandTimeout = null)
+    {
+        if (!procedureName.StartsWith("SP_CHK_"))
+        {
+            throw new ArgumentException($"The procedure name {procedureName} is invalid for {nameof(ExecuteCheckAsync)}. It should start with SP_CHK_<ProcName>.");
+        }
+
+        var procedureResult = await _session.Connection.QuerySingleAsync<bool>(
             procedureName,
             param: procedureParameter,
             commandType: CommandType.StoredProcedure,

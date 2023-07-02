@@ -96,9 +96,20 @@ public class FilesController : ControllerBase
         {
             return BadRequest(new ApiResponse(result.Errors));
         }
-        
+
+        var existingFileWithSameName = await _fileRepository.CheckIfFileExistsByFileNameAsync(formFile.FileName);
+
+        if (existingFileWithSameName)
+        {
+            var enumeratedExistingFiles = await _fileRepository.ListFilesByFileName(formFile.FileName);
+            var existingFiles = enumeratedExistingFiles.ToList();
+            foreach (var file in existingFiles)
+            {
+                await _fileRepository.DeleteFileByIdAsync(file.Id);
+            }
+        }
+
         var fileToAdd = new AddFileDto(formFile.FileName, formFile.Length, formFile.ContentType);
-        
         var id = await _fileRepository.AddFileAsync(fileToAdd);
 
         var existingFileLog = await _fileRepository.GetFileLogByFileIdAndProcessTypeIdAsync(id, ProcessTypesEnum.Upload);

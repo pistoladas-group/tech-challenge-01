@@ -1,4 +1,5 @@
-﻿using TechBox.Api.Common;
+﻿using Serilog;
+using TechBox.Api.Common;
 using TechBox.Api.Data.Dto;
 using TechBox.Api.Models;
 
@@ -36,7 +37,7 @@ public class FileRepository : IFileRepository
         }
         catch (InvalidOperationException e) when (e.Message == "Sequence contains no elements")
         {
-            Console.WriteLine(e);
+            Log.Error(e, "Error executing method GetFileByIdAsync");
             return null;
         }
     }
@@ -49,7 +50,7 @@ public class FileRepository : IFileRepository
         }
         catch (InvalidOperationException e) when (e.Message == "Sequence contains no elements")
         {
-            Console.WriteLine(e);
+            Log.Error(e, "Error executing method GetFileLogByFileIdAndProcessTypeIdAsync");
             return null;
         }
     }
@@ -167,5 +168,19 @@ public class FileRepository : IFileRepository
         }
 
         return affectedRows;
+    }
+
+    public async Task<bool> CheckIfFileExistsByFileNameAsync(string fileName)
+    {
+        var procedurename = "SP_CHK_FileByFileName";
+
+        var exists = await _storedProcedureHandler.ExecuteCheckAsync(procedurename, new { fileName });
+        
+        return exists;
+    }
+    
+    public async Task<IEnumerable<FileDto>> ListFilesByFileName(string fileName)
+    {
+        return await _storedProcedureHandler.ExecuteListAsync<FileDto>("SP_LST_FilesByFileName", new { fileName });
     }
 }

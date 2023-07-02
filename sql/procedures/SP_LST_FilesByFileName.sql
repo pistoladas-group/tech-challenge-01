@@ -1,0 +1,21 @@
+CREATE OR ALTER PROCEDURE SP_LST_FilesByFileName
+(
+	@FileName VARCHAR(100)
+)
+AS
+BEGIN
+    SELECT
+        Files.Id,
+        Files.IsDeleted,
+        Files.CreatedAt,
+        Files.Name,
+        Files.SizeInBytes,
+        Files.Url,
+        Files.ProcessStatusId,
+        Files.ContentType
+    FROM
+        Files
+    WHERE
+        Files.IsDeleted = 0 AND
+        Files.Name = @FileName;
+END;

@@ -172,7 +172,7 @@ const addRow = (data) => {
         }
     });
 
-    tbodyElement.insertRow(0).insertAdjacentElement('beforebegin', clonedRow);
+    tbodyElement.insertBefore(clonedRow, tbodyElement.lastChild);
     clonedRow.classList.remove('d-none');
 };
 
@@ -246,7 +246,6 @@ const enableFileDelete = (row, fileId) => {
     deleteElement.classList.add('pointer');
     
     deleteElement.addEventListener('click', () => {
-        stopPolling(pollingId);
         deleteFile(fileId);
     });
 };
@@ -273,7 +272,6 @@ const deleteFile = (fileId) => {
         if (!response.ok) {
             showErrorAlert("Erro ao excluir arquivo. Tente novamente ou contate o suporte.");
         }
-        startPolling();
     })
     .catch(error => showErrorAlert());
 };

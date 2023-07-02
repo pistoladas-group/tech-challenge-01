@@ -16,6 +16,7 @@ BEGIN
     INNER JOIN
         Files on FileLogs.FileId = Files.Id
     WHERE
+        FileLogs.FileId = @FileId AND
         FileLogs.ProcessStatusId = 1 AND
         FileLogs.IsDeleted = 0 AND
         (   

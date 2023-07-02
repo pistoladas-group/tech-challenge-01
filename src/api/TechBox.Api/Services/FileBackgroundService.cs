@@ -54,9 +54,6 @@ public class FileBackgroundService : IHostedService, IDisposable
             var pendingFileLogs = await _fileRepository.ListFilePendingLogsAsync(pendingFileId, 1, int.MaxValue);
             var convertedPendingLogs = pendingFileLogs.ToList();
 
-            await _fileRepository.UpdateFileLogToProcessingByFileAndProcessTypeIdAsync(pendingFileId, convertedPendingLogs.First().ProcessTypeId);
-            Log.Debug("File {FileId} processing marked as {Processing}.", pendingFileId, "Processing");
-
             var hasPendingDelete = convertedPendingLogs.Any(x => x.ProcessTypeId == ProcessTypesEnum.Delete);
             var hasPendingUpload = convertedPendingLogs.Any(x => x.ProcessTypeId == ProcessTypesEnum.Upload);
 
@@ -82,6 +79,9 @@ public class FileBackgroundService : IHostedService, IDisposable
 
             if (hasPendingUpload)
             {
+                await _fileRepository.UpdateFileLogToProcessingByFileAndProcessTypeIdAsync(pendingFileId, ProcessTypesEnum.Upload);
+                Log.Debug("File {FileId} processing marked as {Processing}.", pendingFileId, "Processing");
+
                 try
                 {
                     await UploadFileAsync(pendingFileId, convertedPendingLogs.First().FileName, convertedPendingLogs.First().FileContentType);
@@ -94,6 +94,9 @@ public class FileBackgroundService : IHostedService, IDisposable
 
             if (hasPendingDelete)
             {
+                await _fileRepository.UpdateFileLogToProcessingByFileAndProcessTypeIdAsync(pendingFileId, ProcessTypesEnum.Delete);
+                Log.Debug("File {FileId} processing marked as {Processing}.", pendingFileId, "Processing");
+
                 try
                 {
                     await DeleteFileAsync(pendingFileId, convertedPendingLogs.First().FileName);

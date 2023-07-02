@@ -17,5 +17,5 @@ BEGIN
         Files
     WHERE
         Files.IsDeleted = 0 AND
-        Files.Id = @Id
+        Files.Id = @Id;
 END;

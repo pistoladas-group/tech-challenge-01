@@ -20,5 +20,5 @@ BEGIN
     WHERE
         FileLogs.IsDeleted = 0 AND
         FileLogs.FileId = @Id AND
-        FileLogs.ProcessTypeId = @ProcessTypeId
+        FileLogs.ProcessTypeId = @ProcessTypeId;
 END;

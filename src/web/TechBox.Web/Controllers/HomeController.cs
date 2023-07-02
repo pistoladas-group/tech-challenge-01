@@ -1,6 +1,6 @@
 ﻿using System.Text.Json;
-
 using Microsoft.AspNetCore.Mvc;
+using TechBox.Web.Configurations;
 
 namespace TechBox.Web.Controllers;
 
@@ -24,7 +24,7 @@ public class HomeController : Controller
     public async Task<IActionResult> UploadFileAsync(IFormFile formFile)
     {
         var client = _httpFactory.CreateClient();
-        var request = new HttpRequestMessage(HttpMethod.Post, $"https://localhost:5001/api/files"); //TODO: deixar a url dinâmica
+        var request = new HttpRequestMessage(HttpMethod.Post, $"{Environment.GetEnvironmentVariable(EnvironmentVariables.ApiBaseUrl)}/api/files");
         var content = new MultipartFormDataContent();
         var streamContent = new StreamContent(formFile.OpenReadStream());
 
@@ -68,7 +68,7 @@ public class HomeController : Controller
     public async Task<IActionResult> ListFilesAsync()
     {
         var client = _httpFactory.CreateClient();
-        var request = new HttpRequestMessage(HttpMethod.Get, $"https://localhost:5001/api/files?pageNumber=1&pageSize=100"); //TODO: deixar a url dinâmica
+        var request = new HttpRequestMessage(HttpMethod.Get, $"{Environment.GetEnvironmentVariable(EnvironmentVariables.ApiBaseUrl)}/api/files?pageNumber=1&pageSize=100");
 
         var apiResponse = await client.SendAsync(request);
 
@@ -80,15 +80,13 @@ public class HomeController : Controller
     }
 
     [HttpDelete("{id:guid}")]
-    public async Task<IActionResult> GetFileStatus([FromRoute] Guid id)
+    public async Task<IActionResult> DeleteFileById([FromRoute] Guid id)
     {
         var client = _httpFactory.CreateClient();
-        var request = new HttpRequestMessage(HttpMethod.Delete, $"https://localhost:5001/api/files/{id}"); //TODO: deixar a url dinâmica
+        var request = new HttpRequestMessage(HttpMethod.Delete, $"{Environment.GetEnvironmentVariable(EnvironmentVariables.ApiBaseUrl)}/api/files/{id}");
         var apiResponse = await client.SendAsync(request);
 
         apiResponse.EnsureSuccessStatusCode();
-        
-        //TODO: seguir daqui
         
         return Ok();
     }

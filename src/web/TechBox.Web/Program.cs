@@ -1,6 +1,9 @@
+using TechBox.Web.Configurations;
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services
+    .AddEnvironmentVariables()
     .AddHttpClient()
     .AddControllersWithViews();
 

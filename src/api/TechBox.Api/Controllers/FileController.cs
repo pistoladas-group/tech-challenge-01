@@ -142,6 +142,8 @@ public class FilesController : ControllerBase
         {
             await _fileRepository.AddFileLogAsync(new AddFileLogDto(id, ProcessTypesEnum.Delete));
         }
+
+        await _fileRepository.DeleteFileByIdAsync(id);
         
         return Accepted(new ApiResponse());
     }

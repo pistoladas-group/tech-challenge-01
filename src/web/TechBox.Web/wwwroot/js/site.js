@@ -1,4 +1,4 @@
-﻿var pollingId = null;
+﻿let pollingId = null;
 
 const rowCloneElement = document.getElementById('data-file-row-to-clone');
 const warningItemCloneElement = document.getElementById('warning-item-to-clone');
@@ -208,7 +208,8 @@ const updateRow = (row, data) => {
     if (data.processStatusId === processStatus.success) {
         hideActionsProcessingElements(row);
         showActionsCrudElements(row);
-        enableFileDownloadAndDelete(row, data.url, data.name);
+        enableFileDownload(row, data.url, data.name);
+        enableFileDelete(row, data.id);
     }
 };
 
@@ -217,7 +218,7 @@ const disableUploadButton = () => {
 };
 
 const enableUploadButton = () => {
-    buttonUploadElement.removeAttribute("disabled", "disabled");
+    buttonUploadElement.removeAttribute("disabled");
 };
 
 const hideActionsCrudElements = (row) => {
@@ -240,11 +241,19 @@ const showActionsProcessingElements = (row) => {
     actionsProcessingElement.classList.remove("d-none");
 };
 
-const enableFileDownloadAndDelete = (row, fileUrl, fileName) => {
+const enableFileDownload = (row, fileUrl, fileName) => {
     let downloadElement = row.querySelector('[data-file-download]');
-    let deleteElement = row.querySelector('[data-file-delete]');
+    downloadElement.addEventListener('click', async () => {
+        await downloadFile(fileUrl, fileName);
+    });
+};
 
-    downloadElement.setAttribute('onclick', `downloadFile('${fileUrl}', '${fileName}')`);
+const enableFileDelete = (row, fileId) => {
+    let deleteElement = row.querySelector('[data-file-delete]');
+    deleteElement.addEventListener('click', () => {
+        stopPolling(pollingId);
+        deleteFile(fileId);
+    });
 };
 
 const downloadFile = async (fileUrl, fileName) => {
@@ -261,16 +270,24 @@ const toDataURL = async (url) => {
     return URL.createObjectURL(blob);
 };
 
-const deleteFile = () => {
-
+const deleteFile = (fileId) => {
+    fetch(`/home/${fileId}`, {
+        method: "DELETE",
+    })
+    .then(response => {
+        if (!response.ok) {
+            showErrorAlert("Erro ao excluir arquivo. Tente novamente ou contate o suporte.");
+        }
+        //tableElement.querySelector(`[data-file-id="${fileId}"]`).remove();
+        startPolling();
+    })
+    .catch(error => showErrorAlert());
 };
 
 const showErrorAlert = (message) => {
     const errorAlertMessageElement = document.getElementById('divErrorAlertMessage');
 
-    let defaultMessage = 'Tente novamente ou contate o suporte';
-
-    errorAlertMessageElement.innerHTML = defaultMessage;
+    errorAlertMessageElement.textContent = 'Tente novamente ou contate o suporte.';
 
     if (typeof message === "string" && message !== "") {
         errorAlertMessageElement.textContent = message;
@@ -286,7 +303,6 @@ const showWarningErrors = (fileName, errors) => {
     let joinedErrors = '';
 
     errors.forEach((error) => {
-
         joinedErrors = joinedErrors + ', ' + error;
         listWarningElement.appendChild(clonedItem);
         clonedItem.classList.remove('d-none');

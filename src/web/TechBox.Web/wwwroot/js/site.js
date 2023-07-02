@@ -183,7 +183,7 @@ const addRow = (data) => {
         }
     });
 
-    tbodyElement.insertRow(0).insertAdjacentElement('beforebegin', clonedRow);
+    tbodyElement.insertBefore(clonedRow, tbodyElement.lastChild);
     clonedRow.classList.remove('d-none');
 };
 
@@ -251,7 +251,6 @@ const enableFileDownload = (row, fileUrl, fileName) => {
 const enableFileDelete = (row, fileId) => {
     let deleteElement = row.querySelector('[data-file-delete]');
     deleteElement.addEventListener('click', () => {
-        stopPolling(pollingId);
         deleteFile(fileId);
     });
 };
@@ -278,8 +277,6 @@ const deleteFile = (fileId) => {
         if (!response.ok) {
             showErrorAlert("Erro ao excluir arquivo. Tente novamente ou contate o suporte.");
         }
-        //tableElement.querySelector(`[data-file-id="${fileId}"]`).remove();
-        startPolling();
     })
     .catch(error => showErrorAlert());
 };

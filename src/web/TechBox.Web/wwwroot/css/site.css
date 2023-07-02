@@ -80,3 +80,7 @@ td {
     color: #0d6831;
     border-color: #c0e7d0
 }
+
+.pointer {
+    cursor: pointer;
+}

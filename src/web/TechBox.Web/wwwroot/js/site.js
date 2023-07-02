@@ -195,10 +195,9 @@ const updateRow = (row, data) => {
     }
 
     if (data.processStatusId === processStatus.success) {
+        nameElement.classList.add('pointer');
         hideActionsProcessingElements(row);
-        showActionsCrudElements(row);
-        enableFileDownload(row, data.url, data.name);
-        enableFileDelete(row, data.id);
+        showActionsCrudElements(row, data.id, data.url, data.name);
     }
 };
 
@@ -215,9 +214,12 @@ const hideActionsCrudElements = (row) => {
     actionsCrudElement.classList.add("d-none");
 };
 
-const showActionsCrudElements = (row) => {
+const showActionsCrudElements = (row, fileId, fileUrl, fileName) => {
     let actionsCrudElement = row.querySelector('[data-file-actions-crud]');
     actionsCrudElement.classList.remove("d-none");
+
+    enableFileDownload(row, fileUrl, fileName);
+    enableFileDelete(row, fileId);
 };
 
 const hideActionsProcessingElements = (row) => {
@@ -232,6 +234,8 @@ const showActionsProcessingElements = (row) => {
 
 const enableFileDownload = (row, fileUrl, fileName) => {
     let downloadElement = row.querySelector('[data-file-download]');
+    downloadElement.classList.add('pointer');
+
     downloadElement.addEventListener('click', async () => {
         await downloadFile(fileUrl, fileName);
     });
@@ -239,6 +243,8 @@ const enableFileDownload = (row, fileUrl, fileName) => {
 
 const enableFileDelete = (row, fileId) => {
     let deleteElement = row.querySelector('[data-file-delete]');
+    deleteElement.classList.add('pointer');
+    
     deleteElement.addEventListener('click', () => {
         stopPolling(pollingId);
         deleteFile(fileId);

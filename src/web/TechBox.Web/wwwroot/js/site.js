@@ -108,37 +108,26 @@ const manageFileUpload = (file) => {
 };
 
 const listFiles = () => {
-    let xhr = new XMLHttpRequest();
-
-    xhr.onreadystatechange = () => {
-        if (xhr.readyState !== 4) {
-            return;
-        }
-
-        if (xhr.readyState === 4 && xhr.status === 500) {
+    fetch('/home/files')
+    .then(response => {
+        if (!response.ok) {
             showErrorAlert();
             stopPolling(pollingId);
+            return;
         }
-
-        if (xhr.readyState === 4 && xhr.status === 200) {
-            const responseText = JSON.parse(xhr.responseText);
-            const response = JSON.parse(responseText);
-
-            if (!response.succeeded && response.errors !== null) {
-                showErrorAlert();
-                stopPolling(pollingId);
-            }
-
+        
+        response.json().then(json => {
             clearTable();
-
-            response.data.forEach((data) => {
+            JSON.parse(json).data.forEach((data) => {
                 setRowData(data);
             });
-        }
-    };
-
-    xhr.open('GET', '/home/files');
-    xhr.send();
+        });
+    })
+    .catch(error => {
+        console.log(error);
+        showErrorAlert();
+        stopPolling(pollingId);
+    });
 };
 
 const clearTable = () => {
@@ -278,7 +267,6 @@ const deleteFile = (fileId) => {
         if (!response.ok) {
             showErrorAlert("Erro ao excluir arquivo. Tente novamente ou contate o suporte.");
         }
-        //tableElement.querySelector(`[data-file-id="${fileId}"]`).remove();
         startPolling();
     })
     .catch(error => showErrorAlert());

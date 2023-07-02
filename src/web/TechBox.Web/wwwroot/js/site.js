@@ -272,6 +272,12 @@ const deleteFile = (fileId) => {
         if (!response.ok) {
             showErrorAlert("Erro ao excluir arquivo. Tente novamente ou contate o suporte.");
         }
+
+        let elementToRemove = tbodyElement.querySelector(`[data-file-id="${fileId}"]`);
+
+        if (elementToRemove) {
+            elementToRemove.remove();
+        }
     })
     .catch(error => showErrorAlert());
 };

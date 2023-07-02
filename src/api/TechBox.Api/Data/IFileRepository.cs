@@ -15,7 +15,7 @@ public interface IFileRepository
     Task<int> UpdateFileLogToSuccessByFileAndProcessTypeIdAsync(Guid fileId, ProcessTypesEnum processTypeId);
     Task<int> UpdateFileLogToFailedByFileAndProcessTypeId(Guid fileId, ProcessTypesEnum processTypeId, string errorMessage);
     Task<IEnumerable<Guid>> ListPendingFileIdsAsync(int pageNumber, int pageSize);
-    Task<FileLogDto?> GetFileLogByFileIdAndProcessTypeIdAsync(Guid fileId, ProcessTypesEnum processTypesId);
+    Task<bool> CheckFileLogByFileIdAndProcessTypeIdAsync(Guid fileId, ProcessTypesEnum processTypesId);
     Task<IEnumerable<ListFilePendingLogsResponseDto>> ListFilePendingLogsAsync(Guid fileId, int pageNumber, int pageSize);
     Task<int> UpdateFileByIdAsync(Guid fileId, Uri? fileUrl, bool isDeleted);
     Task<bool> CheckIfFileExistsByFileNameAsync(string fileName);

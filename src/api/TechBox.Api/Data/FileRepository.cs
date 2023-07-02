@@ -42,17 +42,9 @@ public class FileRepository : IFileRepository
         }
     }
 
-    public async Task<FileLogDto?> GetFileLogByFileIdAndProcessTypeIdAsync(Guid fileId, ProcessTypesEnum processTypesId)
+    public async Task<bool> CheckFileLogByFileIdAndProcessTypeIdAsync(Guid fileId, ProcessTypesEnum processTypesId)
     {
-        try
-        {
-            return await _storedProcedureHandler.ExecuteGetAsync<FileLogDto>("SP_GET_FileLogByFileIdAndProcessType", new GetFileLogByFileIdAndProcessTypeProcedureParameters(fileId, processTypesId));
-        }
-        catch (InvalidOperationException e) when (e.Message == "Sequence contains no elements")
-        {
-            Log.Error(e, "Error executing method GetFileLogByFileIdAndProcessTypeIdAsync");
-            return null;
-        }
+            return await _storedProcedureHandler.ExecuteCheckAsync("SP_CHK_FileLogByFileIdAndProcessType", new GetFileLogByFileIdAndProcessTypeProcedureParameters(fileId, processTypesId));
     }
 
     public async Task<Guid> AddFileAsync(AddFileDto fileDto)
@@ -172,11 +164,7 @@ public class FileRepository : IFileRepository
 
     public async Task<bool> CheckIfFileExistsByFileNameAsync(string fileName)
     {
-        var procedurename = "SP_CHK_FileByFileName";
-
-        var exists = await _storedProcedureHandler.ExecuteCheckAsync(procedurename, new { fileName });
-        
-        return exists;
+        return await _storedProcedureHandler.ExecuteCheckAsync("SP_CHK_FileByFileName", new { fileName });
     }
     
     public async Task<IEnumerable<FileDto>> ListFilesByFileName(string fileName)

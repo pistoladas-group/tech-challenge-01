@@ -112,9 +112,9 @@ public class FilesController : ControllerBase
         var fileToAdd = new AddFileDto(formFile.FileName, formFile.Length, formFile.ContentType);
         var id = await _fileRepository.AddFileAsync(fileToAdd);
 
-        var existingFileLog = await _fileRepository.GetFileLogByFileIdAndProcessTypeIdAsync(id, ProcessTypesEnum.Upload);
+        var existingFileLog = await _fileRepository.CheckFileLogByFileIdAndProcessTypeIdAsync(id, ProcessTypesEnum.Upload);
         
-        if (existingFileLog is null)
+        if (!existingFileLog)
         {
             await _fileRepository.AddFileLogAsync(new AddFileLogDto(id, ProcessTypesEnum.Upload));
         }
@@ -147,9 +147,9 @@ public class FilesController : ControllerBase
 
         await _fileRepository.UpdateFileProcessStatusByIdAsync(id, ProcessStatusEnum.Pending);
 
-        var existingFileLog = await _fileRepository.GetFileLogByFileIdAndProcessTypeIdAsync(id, ProcessTypesEnum.Delete);
+        var existingFileLog = await _fileRepository.CheckFileLogByFileIdAndProcessTypeIdAsync(id, ProcessTypesEnum.Delete);
         
-        if (existingFileLog is null)
+        if (!existingFileLog)
         {
             await _fileRepository.AddFileLogAsync(new AddFileLogDto(id, ProcessTypesEnum.Delete));
         }

@@ -3,11 +3,9 @@
 public class UpdateFileByIdProcedureParameters : UpdateProcedureParameters
 {
     public string? Url { get; set; }
-    public bool IsDeleted { get; set; }
     
-    public UpdateFileByIdProcedureParameters(Guid fileId, Uri? url, bool isDeleted) : base(fileId)
+    public UpdateFileByIdProcedureParameters(Guid fileId, Uri? url) : base(fileId)
     {
         Url = url?.ToString();
-        IsDeleted = isDeleted;
     }
 }

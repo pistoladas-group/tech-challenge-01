@@ -1,8 +1,7 @@
-CREATE OR ALTER PROCEDURE SP_UPD_FileById
+CREATE OR ALTER PROCEDURE SP_UPD_FileUrlById
 (
     @FileId UNIQUEIDENTIFIER,
-    @Url VARCHAR(2500) = NULL,
-    @IsDeleted BIT = NULL
+    @Url VARCHAR(2500) = NULL
 )
 AS
 BEGIN
@@ -10,8 +9,7 @@ BEGIN
         Files
     SET
         Files.ProcessStatusId = 4,
-        Files.Url = @Url,
-        Files.IsDeleted = @IsDeleted
+        Files.Url = @Url
     WHERE
         Files.Id = @FileId;
 

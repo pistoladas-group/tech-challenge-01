@@ -112,9 +112,9 @@ public class FilesController : ControllerBase
         var fileToAdd = new AddFileDto(formFile.FileName, formFile.Length, formFile.ContentType);
         var id = await _fileRepository.AddFileAsync(fileToAdd);
 
-        var existingFileLog = await _fileRepository.CheckFileLogByFileIdAndProcessTypeIdAsync(id, ProcessTypesEnum.Upload);
+        var existingUploadFileLog = await _fileRepository.CheckFileLogByFileIdAndProcessTypeIdAsync(id, ProcessTypesEnum.Upload);
         
-        if (!existingFileLog)
+        if (!existingUploadFileLog)
         {
             await _fileRepository.AddFileLogAsync(new AddFileLogDto(id, ProcessTypesEnum.Upload));
         }

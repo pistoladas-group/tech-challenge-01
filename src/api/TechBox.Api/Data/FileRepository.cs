@@ -108,13 +108,11 @@ public class FileRepository : IFileRepository
 
     public async Task<int> UpdateFileLogToProcessingByFileAndProcessTypeIdAsync(Guid fileId, ProcessTypesEnum processTypeId)
     {
-        var procedureName = "SP_UPD_FileLogToProcessingByFileAndProcessTypeId";
-
-        var affectedRows = await _storedProcedureHandler.ExecuteUpdateAsync(procedureName, new UpdateFileLogToProcessingByFileAndProcessTypeProcedureParameters(fileId, processTypeId));
+        var affectedRows = await _storedProcedureHandler.ExecuteUpdateAsync("SP_UPD_FileLogToProcessingByFileAndProcessTypeId", new UpdateFileLogToProcessingByFileAndProcessTypeProcedureParameters(fileId, processTypeId));
 
         if (affectedRows <= 0)
         {
-            throw new ProcedureExecutionException(procedureName);
+            Log.Warning("No affected rows when trying to update file log to {Processing}, for the type {ProcessType} for the file {FileId}","Processing", processTypeId.ToString(), fileId);
         }
 
         return affectedRows;
@@ -122,13 +120,11 @@ public class FileRepository : IFileRepository
 
     public async Task<int> UpdateFileLogToSuccessByFileAndProcessTypeIdAsync(Guid fileId, ProcessTypesEnum processTypeId)
     {
-        var procedureName = "SP_UPD_FileLogToSuccessByFileAndProcessTypeId";
-
-        var affectedRows = await _storedProcedureHandler.ExecuteUpdateAsync(procedureName, new UpdateFileLogToSuccessByFileAndProcessTypeProcedureParameters(fileId, processTypeId));
+        var affectedRows = await _storedProcedureHandler.ExecuteUpdateAsync("SP_UPD_FileLogToSuccessByFileAndProcessTypeId", new UpdateFileLogToSuccessByFileAndProcessTypeProcedureParameters(fileId, processTypeId));
 
         if (affectedRows <= 0)
         {
-            throw new ProcedureExecutionException(procedureName);
+            Log.Warning("No affected rows when trying to update file log to {Processing}, for the type {ProcessType} for the file {FileId}","Success", processTypeId.ToString(), fileId);
         }
 
         return affectedRows;
@@ -136,23 +132,21 @@ public class FileRepository : IFileRepository
 
     public async Task<int> UpdateFileLogToFailedByFileAndProcessTypeId(Guid fileId, ProcessTypesEnum processTypeId, string errorMessage)
     {
-        var procedureName = "SP_UPD_FileLogToFailedByFileAndProcessTypeId";
-
-        var affectedRows = await _storedProcedureHandler.ExecuteUpdateAsync(procedureName, new UpdateFileLogToFailedByFileAndProcessTypeIdProcedureParameters(fileId, processTypeId, errorMessage));
+        var affectedRows = await _storedProcedureHandler.ExecuteUpdateAsync("SP_UPD_FileLogToFailedByFileAndProcessTypeId", new UpdateFileLogToFailedByFileAndProcessTypeIdProcedureParameters(fileId, processTypeId, errorMessage));
 
         if (affectedRows <= 0)
         {
-            throw new ProcedureExecutionException(procedureName);
+            Log.Warning("No affected rows when trying to update file log to {Processing}, for the type {ProcessType} for the file {FileId}","Failed", processTypeId.ToString(), fileId);
         }
 
         return affectedRows;
     }
 
-    public async Task<int> UpdateFileByIdAsync(Guid fileId, Uri? fileUrl, bool isDeleted)
+    public async Task<int> UpdateFileUrlByIdAsync(Guid fileId, Uri? fileUrl)
     {
-        var procedureName = "SP_UPD_FileById";
+        var procedureName = "SP_UPD_FileUrlById";
 
-        var affectedRows = await _storedProcedureHandler.ExecuteUpdateAsync(procedureName, new UpdateFileByIdProcedureParameters(fileId, fileUrl, isDeleted));
+        var affectedRows = await _storedProcedureHandler.ExecuteUpdateAsync(procedureName, new UpdateFileByIdProcedureParameters(fileId, fileUrl));
 
         if (affectedRows <= 0)
         {

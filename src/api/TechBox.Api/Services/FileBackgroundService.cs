@@ -1,5 +1,4 @@
 using Serilog;
-
 using TechBox.Api.Data;
 using TechBox.Api.Models;
 
@@ -129,7 +128,7 @@ public class FileBackgroundService : IHostedService, IDisposable
         Log.Debug("file {FileId} was deleted from remote storage.", fileId);
 
         await _fileRepository.UpdateFileLogToSuccessByFileAndProcessTypeIdAsync(fileId, ProcessTypesEnum.Delete);
-        await _fileRepository.UpdateFileByIdAsync(fileId, null, true);
+        await _fileRepository.UpdateFileUrlByIdAsync(fileId, null);
         Log.Debug("File {FileId} processing marked as {Success}.", fileId, "Success");
     }
 
@@ -146,7 +145,7 @@ public class FileBackgroundService : IHostedService, IDisposable
         Log.Debug("File {FileId} was deleted from the disk.", fileId);
 
         await _fileRepository.UpdateFileLogToSuccessByFileAndProcessTypeIdAsync(fileId, ProcessTypesEnum.Upload);
-        await _fileRepository.UpdateFileByIdAsync(fileId, uploadedFileUri, false);
+        await _fileRepository.UpdateFileUrlByIdAsync(fileId, uploadedFileUri);
         Log.Debug("File {FileId} processing marked as {Success}.", fileId, "Success");
     }
 

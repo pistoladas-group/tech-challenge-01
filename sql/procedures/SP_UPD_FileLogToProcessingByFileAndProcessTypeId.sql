@@ -17,7 +17,6 @@ BEGIN
         Files ON FileLogs.FileId = Files.Id
     WHERE
         Files.Id = @FileId AND
-        Files.IsDeleted = 0 AND
         FileLogs.ProcessTypeId = @ProcessTypeId;
 
     SELECT @@ROWCOUNT 'AffectedRows';

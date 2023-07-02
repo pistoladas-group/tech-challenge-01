@@ -13,9 +13,15 @@ BEGIN
     INNER JOIN
         Files on FileLogs.FileId = Files.Id
     WHERE
-        FileLogs.ProcessStatusId = 1 and
-        FileLogs.IsDeleted = 0 and
-        Files.IsDeleted = 0
+        FileLogs.ProcessStatusId = 1 AND
+        FileLogs.IsDeleted = 0 AND
+        (   
+            Files.IsDeleted = 0 OR 
+            (
+                Files.IsDeleted = 1 AND
+                FileLogs.ProcessTypeId = 2 -- Delete
+            ) 
+        ) 
     ORDER BY
         Files.CreatedAt
     OFFSET

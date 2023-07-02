@@ -189,15 +189,14 @@ const updateRow = (row, data) => {
     sizeElement.textContent = formatSize(data.sizeInBytes);
     createdAtElement.textContent = formatToLocalDate(data.createdAt);
 
-    if (data.processStatusId === processStatus.pending || data.processStatusId === processStatus.processing) {
-        hideActionsCrudElements(row);
-        showActionsProcessingElements(row);
-    }
-
     if (data.processStatusId === processStatus.success) {
         nameElement.classList.add('pointer');
         hideActionsProcessingElements(row);
         showActionsCrudElements(row, data.id, data.url, data.name);
+    }
+    else {
+        hideActionsCrudElements(row);
+        showActionsProcessingElements(row, data.processStatusId);
     }
 };
 
@@ -227,8 +226,23 @@ const hideActionsProcessingElements = (row) => {
     actionsProcessingElement.classList.add("d-none");
 };
 
-const showActionsProcessingElements = (row) => {
+const showActionsProcessingElements = (row, processStatusId) => {
     let actionsProcessingElement = row.querySelector('[data-file-actions-processing]');
+    let iconProcessingElement = row.querySelector('[data-icon-processing]');
+    let iconErrorElement = row.querySelector('[data-icon-error]');
+
+    iconProcessingElement.classList.add('d-none');
+    iconErrorElement.classList.add('d-none');
+
+    if (processStatusId === processStatus.pending ||
+        processStatusId === processStatus.processing) {
+        iconProcessingElement.classList.remove('d-none');
+    }
+
+    if (processStatusId === processStatus.failed) {
+        iconErrorElement.classList.remove('d-none');
+    }
+
     actionsProcessingElement.classList.remove("d-none");
 };
 

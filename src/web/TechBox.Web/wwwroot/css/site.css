@@ -44,6 +44,10 @@
     color: #4878cb;
 }
 
+.error-icon {
+    color: #f50018;
+}
+
 svg#clouds {
     position: fixed;
     bottom: -160px;

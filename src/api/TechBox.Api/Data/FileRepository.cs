@@ -79,7 +79,7 @@ public class FileRepository : IFileRepository
     {
         var procedureName = "SP_UPD_FileProcessStatusById";
 
-        var affectedRows = await _storedProcedureHandler.ExecuteUpdateAsync(procedureName, new UpdateFileProcessStatusByIdDto(fileId)
+        var affectedRows = await _storedProcedureHandler.ExecuteUpdateAsync(procedureName, new UpdateFileProcessStatusByIdProcedureParameters(fileId)
         {
             ProcessStatusId = processStatusId
         });
@@ -110,7 +110,7 @@ public class FileRepository : IFileRepository
     {
         var procedureName = "SP_UPD_FileLogToProcessingByFileAndProcessTypeId";
 
-        var affectedRows = await _storedProcedureHandler.ExecuteUpdateAsync(procedureName, new UpdateFileLogToProcessingByFileAndProcessTypeDto(fileId, processTypeId));
+        var affectedRows = await _storedProcedureHandler.ExecuteUpdateAsync(procedureName, new UpdateFileLogToProcessingByFileAndProcessTypeProcedureParameters(fileId, processTypeId));
 
         if (affectedRows <= 0)
         {
@@ -124,7 +124,7 @@ public class FileRepository : IFileRepository
     {
         var procedureName = "SP_UPD_FileLogToSuccessByFileAndProcessTypeId";
 
-        var affectedRows = await _storedProcedureHandler.ExecuteUpdateAsync(procedureName, new UpdateFileLogToSuccessByFileAndProcessTypeDto(fileId, processTypeId));
+        var affectedRows = await _storedProcedureHandler.ExecuteUpdateAsync(procedureName, new UpdateFileLogToSuccessByFileAndProcessTypeProcedureParameters(fileId, processTypeId));
 
         if (affectedRows <= 0)
         {
@@ -138,7 +138,7 @@ public class FileRepository : IFileRepository
     {
         var procedureName = "SP_UPD_FileLogToFailedByFileAndProcessTypeId";
 
-        var affectedRows = await _storedProcedureHandler.ExecuteUpdateAsync(procedureName, new UpdateFileLogToFailedByFileAndProcessTypeIdDto(fileId, processTypeId, errorMessage));
+        var affectedRows = await _storedProcedureHandler.ExecuteUpdateAsync(procedureName, new UpdateFileLogToFailedByFileAndProcessTypeIdProcedureParameters(fileId, processTypeId, errorMessage));
 
         if (affectedRows <= 0)
         {
